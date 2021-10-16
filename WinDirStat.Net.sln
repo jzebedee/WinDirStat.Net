@@ -3,15 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalFun.UI.Behaviors", "FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj", "{7DA5A107-B474-4AC0-B861-63A489DB0C02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FunctionalFun.UI.Behaviors", "FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj", "{7DA5A107-B474-4AC0-B861-63A489DB0C02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDirStat.Net.Wpf.Base", "WinDirStat.Net.Wpf.Base\WinDirStat.Net.Wpf.Base.csproj", "{EF57DB12-06C2-4441-BA5E-56AEB8E0B907}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDirStat.Net.Wpf.Single", "WinDirStat.Net.Wpf.Single\WinDirStat.Net.Wpf.Single.csproj", "{DA620261-55E4-4382-8866-168D958A3BE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDirStat.Net.Wpf.Single", "WinDirStat.Net.Wpf.Single\WinDirStat.Net.Wpf.Single.csproj", "{DA620261-55E4-4382-8866-168D958A3BE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{46B0460D-2FF3-421B-843A-C44A4599B51B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NtfsReader", "NtfsReader\NtfsReader.csproj", "{57FD4ACE-28E4-4BCC-9E94-8DE342213A6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{FCFDCB3E-9574-4AC0-8D2E-6829EC747482}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,8 +50,8 @@ Global
 		{57FD4ACE-28E4-4BCC-9E94-8DE342213A6A} = {46B0460D-2FF3-421B-843A-C44A4599B51B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A93EEC7D-680B-4135-9261-B4201D37538C}
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45
+		SolutionGuid = {A93EEC7D-680B-4135-9261-B4201D37538C}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
