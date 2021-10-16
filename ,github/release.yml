@@ -19,7 +19,7 @@ jobs:
       run: dotnet restore
 
     - name: Publish (.NET)
-      run: dotnet publish --no-restore --no-self-contained -o pub/net/
+      run: dotnet publish --no-restore -c Release --no-self-contained -o pub/net/
     - name: Upload .NET build
       uses: actions/upload-artifact@v2
       with:
@@ -27,7 +27,7 @@ jobs:
           path: pub/net/*.*
 
     - name: Publish (x86)
-      run: dotnet publish --no-restore -r win-x86 -o pub/x86/
+      run: dotnet publish --no-restore -c Release -r win-x86 -o pub/x86/
     - name: Upload x86 build
       uses: actions/upload-artifact@v2
       with:
@@ -35,7 +35,7 @@ jobs:
           path: pub/x86/*.*
 
     - name: Publish (x64)
-      run: dotnet publish --no-restore -r win-x64 -o pub/x64/
+      run: dotnet publish --no-restore -c Release -r win-x64 -o pub/x64/
     - name: Upload x64 build
       uses: actions/upload-artifact@v2
       with:
