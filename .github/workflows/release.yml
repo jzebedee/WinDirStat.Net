@@ -15,9 +15,9 @@ jobs:
       uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
+
     - name: Install dependencies
       run: dotnet restore
-
     - name: Publish (.NET)
       run: dotnet publish --no-restore -c Release --no-self-contained -o pub/net/
     - name: Upload .NET build
@@ -26,6 +26,8 @@ jobs:
           name: windirstat.net
           path: pub/net/*.*
 
+    - name: Install dependencies (x86)
+      run: dotnet restore -r win-x86
     - name: Publish (x86)
       run: dotnet publish --no-restore -c Release -r win-x86 -o pub/x86/
     - name: Upload x86 build
@@ -34,6 +36,8 @@ jobs:
           name: windirstat.net-x86
           path: pub/x86/*.*
 
+    - name: Install dependencies (x64)
+      run: dotnet restore -r win-x64
     - name: Publish (x64)
       run: dotnet publish --no-restore -c Release -r win-x64 -o pub/x64/
     - name: Upload x64 build
