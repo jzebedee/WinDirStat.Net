@@ -15,19 +15,6 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>TRACE;WINDOWS;WPF</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
-		<Compile Remove="Services\Interfaces\IBitmapFactory.cs" />
-		<Compile Remove="Services\Interfaces\IClipboardService.cs" />
-		<Compile Remove="Services\Interfaces\IIconCacheService.cs" />
-		<Compile Remove="Services\Interfaces\IScanningService.cs" />
-		<Compile Remove="Services\Interfaces\ISettingsService.cs" />
-		<Compile Remove="Services\Interfaces\ISystemService.cs" />
-		<Compile Remove="Services\Interfaces\IUIService.cs" />
-		<Compile Remove="Services\Interfaces\IWindow.cs" />
-		<Compile Remove="Utils\DelayedAction.cs" />
-		<Compile Remove="Utils\DelayedGC.cs" />
-		<Compile Remove="Utils\Volatiles\VolatileCompound.cs" />
-	</ItemGroup>
 	<!-- NuGet References -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.0" />
@@ -68,18 +55,5 @@
 		<Compile Update="ViewModel\Files\FileItemViewModel.*.cs">
 			<DependentUpon>ViewModel\Files\FileItemViewModel.cs</DependentUpon>
 		</Compile>
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="Services\Interfaces\IBitmapFactory.cs" />
-		<None Include="Services\Interfaces\IClipboardService.cs" />
-		<None Include="Services\Interfaces\IIconCacheService.cs" />
-		<None Include="Services\Interfaces\IScanningService.cs" />
-		<None Include="Services\Interfaces\ISettingsService.cs" />
-		<None Include="Services\Interfaces\ISystemService.cs" />
-		<None Include="Services\Interfaces\IUIService.cs" />
-		<None Include="Services\Interfaces\IWindow.cs" />
-		<None Include="Utils\DelayedAction.cs" />
-		<None Include="Utils\DelayedGC.cs" />
-		<None Include="Utils\Volatiles\VolatileCompound.cs" />
 	</ItemGroup>
 </Project>
