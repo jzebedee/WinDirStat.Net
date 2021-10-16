@@ -13,6 +13,9 @@
 		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<LangVersion>latest</LangVersion>
+
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishReadyToRun>true</PublishReadyToRun>
 	</PropertyGroup>
 	<PropertyGroup>
 		<ApplicationIcon>Resources\App.ico</ApplicationIcon>
