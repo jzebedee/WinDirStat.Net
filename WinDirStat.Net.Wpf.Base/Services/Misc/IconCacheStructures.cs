@@ -34,7 +34,7 @@ namespace WinDirStat.Net.Services {
 	}
 
 	/// <summary>A structure containing both a cached icon and name.</summary>
-	public record class IconAndName(ImageSource Icon, string Name);
+	public record IconAndName(ImageSource Icon, string Name);
 
 	/// <summary>The callback delegate for caching an icon.</summary>
 	/// 
