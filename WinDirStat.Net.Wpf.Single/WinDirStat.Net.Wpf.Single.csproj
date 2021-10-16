@@ -16,6 +16,7 @@
 
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishReadyToRun>true</PublishReadyToRun>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	</PropertyGroup>
 	<PropertyGroup>
 		<ApplicationIcon>Resources\App.ico</ApplicationIcon>
