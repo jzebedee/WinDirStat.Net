@@ -21,10 +21,6 @@
 		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="Controls\FocusExtension.cs" />
-		<None Include="Converters\ZeroGridLengthWhenBoolean.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<ProjectReference Include="..\FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj" />
 		<ProjectReference Include="..\WinDirStat.Net.Wpf.Base\WinDirStat.Net.Wpf.Base.csproj" />
 	</ItemGroup>
@@ -50,9 +46,5 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="Controls\FocusExtension.cs" />
-		<Compile Remove="Converters\ZeroGridLengthWhenBoolean.cs" />
 	</ItemGroup>
 </Project>
