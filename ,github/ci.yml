@@ -1,0 +1,18 @@
+name: CI Build
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '5.0.x' ]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET SDK ${{ matrix.dotnet }}
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build (.NET)
+      run: dotnet build --no-restore -c Release
