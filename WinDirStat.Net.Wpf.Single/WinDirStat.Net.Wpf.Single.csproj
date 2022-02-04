@@ -2,49 +2,27 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<OutputType>WinExe</OutputType>
-		<RootNamespace>WinDirStat.Net.Wpf</RootNamespace>
-		<AssemblyName>WinDirStat.Net</AssemblyName>
-		<Title>WinDirStat.Net</Title>
-		<Company>Trigger's Tools &amp; Games</Company>
-		<Product>WinDirStat.Net</Product>
-		<Copyright>Copyright © Robert Jordan {YEAR}</Copyright>
-		<Version>0.0.1.0</Version>
-		<NeutralLanguage>en-US</NeutralLanguage>
 		<UseWPF>true</UseWPF>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<LangVersion>latest</LangVersion>
-	</PropertyGroup>
-	<PropertyGroup>
-		<ApplicationIcon>Resources\App.ico</ApplicationIcon>
-	</PropertyGroup>
-	<PropertyGroup>
-		<ApplicationManifest>Properties\App.manifest</ApplicationManifest>
+        <ApplicationIcon>Resources\App.ico</ApplicationIcon>
+        <ApplicationManifest>Properties\App.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj" />
-		<ProjectReference Include="..\WinDirStat.Net.Wpf.Base\WinDirStat.Net.Wpf.Base.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Resource Include="Resources\Icons\*.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<Resource Include="Resources\FileIcons\*.png" />
-	</ItemGroup>
-	<ItemGroup>
-		<Resource Include="Resources\App.ico" />
-	</ItemGroup>
+        <Resource Include="Resources\App.ico" />
+        <Resource Include="Resources\Icons\*.png" />
+        <Resource Include="Resources\FileIcons\*.png" />
+    </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 		<PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
-		<PackageReference Include="TriggersTools.Build.BuildTime">
-			<Version>2.0.0</Version>
-		</PackageReference>
-		<PackageReference Include="TriggersTools.Build.CopyrightYear">
-			<Version>1.0.2</Version>
-		</PackageReference>
 		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj" />
+        <ProjectReference Include="..\WinDirStat.Net.Wpf.Base\WinDirStat.Net.Wpf.Base.csproj" />
+    </ItemGroup>
 </Project>
