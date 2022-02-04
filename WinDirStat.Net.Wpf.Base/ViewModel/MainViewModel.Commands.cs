@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows;
 using WinDirStat.Net.Model.Drives;
@@ -112,6 +113,7 @@ namespace WinDirStat.Net.ViewModel {
 		private bool CanExecuteEmptyRecycleBin() {
 			return allRecycleBinInfo.ItemCount != 0 && allRecycleBinInfo.Size != 0;
 		}
+        [SupportedOSPlatform("windows")]
 		private bool CanExecuteElevate() {
 			return !OS.IsElevated;
 		}
