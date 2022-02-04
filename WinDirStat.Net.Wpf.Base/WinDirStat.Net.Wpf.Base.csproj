@@ -17,13 +17,13 @@
 	</PropertyGroup>
 	<!-- NuGet References -->
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.0" />
-		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.0" />
+		<PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
+		<PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
 		<PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
-		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.246501">
+		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+		<PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
 	</ItemGroup>
 	<!-- Project References -->
 	<ItemGroup>
