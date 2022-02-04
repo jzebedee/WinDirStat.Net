@@ -11,7 +11,7 @@ indent_style = space
 
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
-indent_size = 4
+indent_size = 2
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
 end_of_line = crlf
@@ -187,6 +187,7 @@ csharp_style_conditional_delegate_call = true:suggestion
 csharp_style_var_elsewhere = false:silent
 csharp_style_var_when_type_is_apparent = false:silent
 csharp_style_var_for_built_in_types = false:silent
+csharp_space_around_binary_operators = before_and_after
 
 [*.{cs,vb}]
 #### Naming styles ####
