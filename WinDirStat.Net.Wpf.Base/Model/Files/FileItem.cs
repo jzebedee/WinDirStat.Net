@@ -8,83 +8,91 @@ using System.Threading.Tasks;
 using WinDirStat.Net.Model.Extensions;
 using WinDirStat.Net.Services;
 
-namespace WinDirStat.Net.Model.Files {
-	/// <summary>The file tree item that identifies an actual file.</summary>
-	[Serializable]
-	public class FileItem : FileItemBase {
+namespace WinDirStat.Net.Model.Files;
 
-		#region Fields
+/// <summary>The file tree item that identifies an actual file.</summary>
+[Serializable]
+public class FileItem : FileItemBase
+{
 
-		/// <summary>Gets the extension item of the file.</summary>
-		public override sealed ExtensionItem ExtensionItem { get; }
+    #region Fields
 
-		#endregion
+    /// <summary>Gets the extension item of the file.</summary>
+    public override sealed ExtensionItem ExtensionItem { get; }
 
-		#region Constructors
+    #endregion
 
-		/// <summary>Constructs the <see cref="FileItem"/> with a <see cref="FileSystemInfo"/>.</summary>
-		/// 
-		/// <param name="info">The file information.</param>
-		/// <param name="extension">The extension information.</param>
-		public FileItem(FileSystemInfo info, ExtensionItem extension)
-			: base(info, FileItemType.File, FileItemFlags.FileType)
-		{
-			Debug.Assert(extension != null);
-			ExtensionItem = extension;
-		}
+    #region Constructors
 
-		/// <summary>Constructs the <see cref="FileItem"/> with a <see cref="IScanFileInfo"/>.</summary>
-		/// 
-		/// <param name="info">The file information.</param>
-		/// <param name="extension">The extension information.</param>
-		public FileItem(IScanFileInfo info, ExtensionItem extension)
-			: base(info, FileItemType.File, FileItemFlags.FileType)
-		{
-			Debug.Assert(extension != null);
-			ExtensionItem = extension;
-		}
+    /// <summary>Constructs the <see cref="FileItem"/> with a <see cref="FileSystemInfo"/>.</summary>
+    /// 
+    /// <param name="info">The file information.</param>
+    /// <param name="extension">The extension information.</param>
+    public FileItem(FileSystemInfo info, ExtensionItem extension)
+        : base(info, FileItemType.File, FileItemFlags.FileType)
+    {
+        Debug.Assert(extension != null);
+        ExtensionItem = extension;
+    }
 
-		#endregion
+    /// <summary>Constructs the <see cref="FileItem"/> with a <see cref="IScanFileInfo"/>.</summary>
+    /// 
+    /// <param name="info">The file information.</param>
+    /// <param name="extension">The extension information.</param>
+    public FileItem(IScanFileInfo info, ExtensionItem extension)
+        : base(info, FileItemType.File, FileItemFlags.FileType)
+    {
+        Debug.Assert(extension != null);
+        ExtensionItem = extension;
+    }
 
-		#region FileItemBase Overrides
+    #endregion
 
-		/// <summary>
-		/// Gets the extension of the file. Empty extensions are always returned with a '.'.
-		/// </summary>
-		public override sealed string Extension => ExtensionItem.Extension;
+    #region FileItemBase Overrides
 
-		#endregion
+    /// <summary>
+    /// Gets the extension of the file. Empty extensions are always returned with a '.'.
+    /// </summary>
+    public override sealed string Extension => ExtensionItem.Extension;
 
-		#region FileItemBase Override Methods
+    #endregion
 
-		/// <summary>Refreshes the file. Returns true if it still exists.</summary>
-		/// 
-		/// <returns>True if the file still exists.</returns>
-		public override sealed bool Refresh() {
-			FileInfo info = new FileInfo(FullName);
-			if (info.Exists && !info.Attributes.HasFlag(FileAttributes.Directory)) {
-				Attributes = info.Attributes;
+    #region FileItemBase Override Methods
 
-				long oldSize = Size;
-				if (!info.Attributes.HasFlag(FileAttributes.ReparsePoint))
-					Size = info.Length;
-				else
-					Size = 0L;
-				ExtensionItem.RefreshFile(Size, oldSize);
+    /// <summary>Refreshes the file. Returns true if it still exists.</summary>
+    /// 
+    /// <returns>True if the file still exists.</returns>
+    public override sealed bool Refresh()
+    {
+        FileInfo info = new FileInfo(FullName);
+        if (info.Exists && !info.Attributes.HasFlag(FileAttributes.Directory))
+        {
+            Attributes = info.Attributes;
 
-				LastWriteTimeUtc = info.LastWriteTimeUtc;
-				
-				return RefreshFinal(true);
-			}
-			ExtensionItem.RemoveFile(Size);
-			return RefreshFinal(false);
-		}
+            long oldSize = Size;
+            if (!info.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                Size = info.Length;
+            }
+            else
+            {
+                Size = 0L;
+            }
 
-		/// <summary>Checks if the file still exists.</summary>
-		/// 
-		/// <returns>True if the file exists.</returns>
-		public override sealed bool CheckExists() => CheckExistsFinal(File.Exists(FullName));
+            ExtensionItem.RefreshFile(Size, oldSize);
 
-		#endregion
-	}
+            LastWriteTimeUtc = info.LastWriteTimeUtc;
+
+            return RefreshFinal(true);
+        }
+        ExtensionItem.RemoveFile(Size);
+        return RefreshFinal(false);
+    }
+
+    /// <summary>Checks if the file still exists.</summary>
+    /// 
+    /// <returns>True if the file exists.</returns>
+    public override sealed bool CheckExists() => CheckExistsFinal(File.Exists(FullName));
+
+    #endregion
 }

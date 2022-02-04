@@ -6,76 +6,88 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WinDirStat.Net.Wpf.Controls {
-	public class VisibleRowDefinition : RowDefinition {
+namespace WinDirStat.Net.Wpf.Controls;
 
-		public static readonly DependencyProperty VisibleProperty =
-			DependencyProperty.Register("Visible", typeof(bool), typeof(VisibleRowDefinition),
-				new PropertyMetadata(true, OnVisibleChanged));
+public class VisibleRowDefinition : RowDefinition
+{
 
-		private static void OnVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			VisibleRowDefinition row = (VisibleRowDefinition) d;
+    public static readonly DependencyProperty VisibleProperty =
+        DependencyProperty.Register("Visible", typeof(bool), typeof(VisibleRowDefinition),
+            new PropertyMetadata(true, OnVisibleChanged));
 
-			if (row.Visible) {
-				row.visibleChanging = true;
-				row.Height    = row.storedHeight;
-				row.MinHeight = row.storedMinHeight;
-				row.MaxHeight = row.storedMaxHeight;
-				row.visibleChanging = false;
-			}
-			else {
-				row.visibleChanging = true;
-				row.storedHeight    = row.Height;
-				row.storedMinHeight = row.MinHeight;
-				row.storedMaxHeight = row.MaxHeight;
-				row.MinHeight = 0d;
-				row.Height    = new GridLength(0);
-				row.MaxHeight = 0d;
-				row.visibleChanging = false;
-			}
-		}
+    private static void OnVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        VisibleRowDefinition row = (VisibleRowDefinition)d;
 
-		private static void OnHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			VisibleRowDefinition row = (VisibleRowDefinition) d;
-			if (!row.Visible && !row.visibleChanging) {
-				row.storedHeight = (GridLength) e.NewValue;
-				row.Height = new GridLength(0);
-			}
-		}
+        if (row.Visible)
+        {
+            row.visibleChanging = true;
+            row.Height = row.storedHeight;
+            row.MinHeight = row.storedMinHeight;
+            row.MaxHeight = row.storedMaxHeight;
+            row.visibleChanging = false;
+        }
+        else
+        {
+            row.visibleChanging = true;
+            row.storedHeight = row.Height;
+            row.storedMinHeight = row.MinHeight;
+            row.storedMaxHeight = row.MaxHeight;
+            row.MinHeight = 0d;
+            row.Height = new GridLength(0);
+            row.MaxHeight = 0d;
+            row.visibleChanging = false;
+        }
+    }
 
-		private static void OnMinHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			VisibleRowDefinition row = (VisibleRowDefinition) d;
-			if (!row.Visible && !row.visibleChanging) {
-				row.storedMinHeight = (double) e.NewValue;
-				row.MinHeight = 0;
-			}
-		}
+    private static void OnHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        VisibleRowDefinition row = (VisibleRowDefinition)d;
+        if (!row.Visible && !row.visibleChanging)
+        {
+            row.storedHeight = (GridLength)e.NewValue;
+            row.Height = new GridLength(0);
+        }
+    }
 
-		private static void OnMaxHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			VisibleRowDefinition row = (VisibleRowDefinition) d;
-			if (!row.Visible && !row.visibleChanging) {
-				row.storedMaxHeight = (double) e.NewValue;
-				row.MaxHeight = 0;
-			}
-		}
+    private static void OnMinHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        VisibleRowDefinition row = (VisibleRowDefinition)d;
+        if (!row.Visible && !row.visibleChanging)
+        {
+            row.storedMinHeight = (double)e.NewValue;
+            row.MinHeight = 0;
+        }
+    }
 
-		static VisibleRowDefinition() {
-			HeightProperty.AddOwner(typeof(VisibleRowDefinition),
-				new FrameworkPropertyMetadata(HeightProperty.DefaultMetadata.DefaultValue, OnHeightChanged));
-			MinHeightProperty.AddOwner(typeof(VisibleRowDefinition),
-				new FrameworkPropertyMetadata(MinHeightProperty.DefaultMetadata.DefaultValue, OnMinHeightChanged));
-			MaxHeightProperty.AddOwner(typeof(VisibleRowDefinition),
-				new FrameworkPropertyMetadata(MaxHeightProperty.DefaultMetadata.DefaultValue, OnMaxHeightChanged));
-		}
+    private static void OnMaxHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        VisibleRowDefinition row = (VisibleRowDefinition)d;
+        if (!row.Visible && !row.visibleChanging)
+        {
+            row.storedMaxHeight = (double)e.NewValue;
+            row.MaxHeight = 0;
+        }
+    }
 
-		public bool Visible {
-			get => (bool) GetValue(VisibleProperty);
-			set => SetValue(VisibleProperty, value);
-		}
+    static VisibleRowDefinition()
+    {
+        HeightProperty.AddOwner(typeof(VisibleRowDefinition),
+            new FrameworkPropertyMetadata(HeightProperty.DefaultMetadata.DefaultValue, OnHeightChanged));
+        MinHeightProperty.AddOwner(typeof(VisibleRowDefinition),
+            new FrameworkPropertyMetadata(MinHeightProperty.DefaultMetadata.DefaultValue, OnMinHeightChanged));
+        MaxHeightProperty.AddOwner(typeof(VisibleRowDefinition),
+            new FrameworkPropertyMetadata(MaxHeightProperty.DefaultMetadata.DefaultValue, OnMaxHeightChanged));
+    }
 
-		private bool visibleChanging = false;
-		private GridLength storedHeight = (GridLength) HeightProperty.DefaultMetadata.DefaultValue;
-		private double storedMinHeight = (double) MinHeightProperty.DefaultMetadata.DefaultValue;
-		private double storedMaxHeight = (double) MaxHeightProperty.DefaultMetadata.DefaultValue;
-	}
+    public bool Visible
+    {
+        get => (bool)GetValue(VisibleProperty);
+        set => SetValue(VisibleProperty, value);
+    }
+
+    private bool visibleChanging = false;
+    private GridLength storedHeight = (GridLength)HeightProperty.DefaultMetadata.DefaultValue;
+    private double storedMinHeight = (double)MinHeightProperty.DefaultMetadata.DefaultValue;
+    private double storedMaxHeight = (double)MaxHeightProperty.DefaultMetadata.DefaultValue;
 }

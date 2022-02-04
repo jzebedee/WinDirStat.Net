@@ -10,54 +10,62 @@ using System.Windows.Media;
 using WinDirStat.Net.Utils;
 using WinDirStat.Net.Wpf.Utils;
 
-namespace WinDirStat.Net.Wpf.Controls {
-	public class ImageButton : Button {
+namespace WinDirStat.Net.Wpf.Controls;
 
-		/// <summary>The dependency property for the button's image.</summary>
-		public static readonly DependencyProperty SourceProperty =
-			DependencyProperty.RegisterAttached("Source", typeof(ImageSource), typeof(ImageButton),
-				new FrameworkPropertyMetadata(OnSourceChanged));
+public class ImageButton : Button
+{
 
-		/// <summary>Gets or sets the source of the button's image.</summary>
-		[Category("Common")]
-		public ImageSource Source {
-			get => (ImageSource) GetValue(SourceProperty);
-			set => SetValue(SourceProperty, value);
-		}
+    /// <summary>The dependency property for the button's image.</summary>
+    public static readonly DependencyProperty SourceProperty =
+        DependencyProperty.RegisterAttached("Source", typeof(ImageSource), typeof(ImageButton),
+            new FrameworkPropertyMetadata(OnSourceChanged));
 
-		/// <summary>Called when the source property for the button is changed.</summary>
-		private static void OnSourceChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			ImageButton button = (ImageButton) sender;
-			button.image.Source = button.Source;
+    /// <summary>Gets or sets the source of the button's image.</summary>
+    [Category("Common")]
+    public ImageSource Source
+    {
+        get => (ImageSource)GetValue(SourceProperty);
+        set => SetValue(SourceProperty, value);
+    }
 
-			button.CoerceValue(ContentProperty);
-		}
+    /// <summary>Called when the source property for the button is changed.</summary>
+    private static void OnSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        ImageButton button = (ImageButton)sender;
+        button.image.Source = button.Source;
 
-		private static object CoerceContent(DependencyObject d, object value) {
-			ImageButton button = (ImageButton) d;
+        button.CoerceValue(ContentProperty);
+    }
 
-			if (button.IsValueUnsetAndNull(ContentProperty, value)) {
-				return button.image;
-			}
-			return value;
-		}
+    private static object CoerceContent(DependencyObject d, object value)
+    {
+        ImageButton button = (ImageButton)d;
 
-		/// <summary>The image that contains the buttons's icon.</summary>
-		private Image image;
+        if (button.IsValueUnsetAndNull(ContentProperty, value))
+        {
+            return button.image;
+        }
+        return value;
+    }
 
-		/// <summary>Initializes the image buttons default style.</summary>
-		static ImageButton() {
-			//DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageButton),
-			//		   new FrameworkPropertyMetadata(typeof(ImageButton)));
-			ContentProperty.OverrideMetadata(typeof(ImageButton),
-				new FrameworkPropertyMetadata(null, CoerceContent));
-		}
+    /// <summary>The image that contains the buttons's icon.</summary>
+    private Image image;
 
-		/// <summary>Constructs an empty buttons.</summary>
-		public ImageButton() {
-			image = new Image() {
-				Stretch = Stretch.None,
-			};
-		}
-	}
+    /// <summary>Initializes the image buttons default style.</summary>
+    static ImageButton()
+    {
+        //DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageButton),
+        //		   new FrameworkPropertyMetadata(typeof(ImageButton)));
+        ContentProperty.OverrideMetadata(typeof(ImageButton),
+            new FrameworkPropertyMetadata(null, CoerceContent));
+    }
+
+    /// <summary>Constructs an empty buttons.</summary>
+    public ImageButton()
+    {
+        image = new Image()
+        {
+            Stretch = Stretch.None,
+        };
+    }
 }

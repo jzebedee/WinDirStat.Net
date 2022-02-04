@@ -8,90 +8,104 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace WinDirStat.Net.Wpf.Controls.SortList {
-	public class SortViewColumn : GridViewColumn {
+namespace WinDirStat.Net.Wpf.Controls.SortList;
 
-		public static readonly DependencyProperty TextAlignmentProperty =
-			TextBlock.TextAlignmentProperty.AddOwner(typeof(SortViewColumn),
-				new FrameworkPropertyMetadata(TextAlignment.Left, OnTextAlignmentChanged));
+public class SortViewColumn : GridViewColumn
+{
 
-		private static void OnTextAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			if (d is SortViewColumn column) {
-				switch (column.TextAlignment) {
-				case TextAlignment.Left:
-					column.HeaderContainerStyle = SortViewKeys.HeaderContainerLeftAlignStyle;
-					break;
-				case TextAlignment.Right:
-					column.HeaderContainerStyle = SortViewKeys.HeaderContainerRightAlignStyle;
-					break;
-				default:
-					column.HeaderContainerStyle = SortViewKeys.HeaderContainerCenterAlignStyle;
-					break;
-				}
-				if (column.cellBinding != null)
-					column.RebuildCellTemplate();
-			}
-		}
+    public static readonly DependencyProperty TextAlignmentProperty =
+        TextBlock.TextAlignmentProperty.AddOwner(typeof(SortViewColumn),
+            new FrameworkPropertyMetadata(TextAlignment.Left, OnTextAlignmentChanged));
 
-		public TextAlignment TextAlignment {
-			get => (TextAlignment) GetValue(TextAlignmentProperty);
-			set => SetValue(TextAlignmentProperty, value);
-		}
+    private static void OnTextAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is SortViewColumn column)
+        {
+            switch (column.TextAlignment)
+            {
+                case TextAlignment.Left:
+                    column.HeaderContainerStyle = SortViewKeys.HeaderContainerLeftAlignStyle;
+                    break;
+                case TextAlignment.Right:
+                    column.HeaderContainerStyle = SortViewKeys.HeaderContainerRightAlignStyle;
+                    break;
+                default:
+                    column.HeaderContainerStyle = SortViewKeys.HeaderContainerCenterAlignStyle;
+                    break;
+            }
+            if (column.cellBinding != null)
+            {
+                column.RebuildCellTemplate();
+            }
+        }
+    }
 
-		public static readonly DependencyProperty DefaultSortDirectionProperty =
-			DependencyProperty.Register("DefaultSortDirection", typeof(ListSortDirection), typeof(SortViewColumn),
-				new FrameworkPropertyMetadata(ListSortDirection.Ascending));
+    public TextAlignment TextAlignment
+    {
+        get => (TextAlignment)GetValue(TextAlignmentProperty);
+        set => SetValue(TextAlignmentProperty, value);
+    }
 
-		public ListSortDirection DefaultSortDirection {
-			get => (ListSortDirection) GetValue(DefaultSortDirectionProperty);
-			set => SetValue(DefaultSortDirectionProperty, value);
-		}
+    public static readonly DependencyProperty DefaultSortDirectionProperty =
+        DependencyProperty.Register("DefaultSortDirection", typeof(ListSortDirection), typeof(SortViewColumn),
+            new FrameworkPropertyMetadata(ListSortDirection.Ascending));
 
-		public static readonly DependencyProperty SortModeProperty =
-			DependencyProperty.Register("SortMode", typeof(string), typeof(SortViewColumn),
-				new FrameworkPropertyMetadata(null));
+    public ListSortDirection DefaultSortDirection
+    {
+        get => (ListSortDirection)GetValue(DefaultSortDirectionProperty);
+        set => SetValue(DefaultSortDirectionProperty, value);
+    }
 
-		public string SortMode {
-			get => (string) GetValue(SortModeProperty);
-			set => SetValue(SortModeProperty, value);
-		}
+    public static readonly DependencyProperty SortModeProperty =
+        DependencyProperty.Register("SortMode", typeof(string), typeof(SortViewColumn),
+            new FrameworkPropertyMetadata(null));
 
-		public ListSortDirection? SortDirection {
-			get => SortListView.GetColumnSortDirection(this);
-			//internal set => SetValue(SortDirectionPropertyKey, value);
-		}
+    public string SortMode
+    {
+        get => (string)GetValue(SortModeProperty);
+        set => SetValue(SortModeProperty, value);
+    }
 
-		public static readonly DependencyProperty CellDataTemplateProperty =
-			DependencyProperty.Register("CellDataTemplate", typeof(DataTemplate), typeof(SortViewColumn),
-				new FrameworkPropertyMetadata(OnCellDataTemplateChanged));
+    public ListSortDirection? SortDirection
+    {
+        get => SortListView.GetColumnSortDirection(this);
+        //internal set => SetValue(SortDirectionPropertyKey, value);
+    }
 
-		public DataTemplate CellDataTemplate {
-			get => (DataTemplate) GetValue(CellDataTemplateProperty);
-			set => SetValue(CellDataTemplateProperty, value);
-		}
+    public static readonly DependencyProperty CellDataTemplateProperty =
+        DependencyProperty.Register("CellDataTemplate", typeof(DataTemplate), typeof(SortViewColumn),
+            new FrameworkPropertyMetadata(OnCellDataTemplateChanged));
 
-		static SortViewColumn() {
-			//HeaderContainerStyleProperty.OverrideMetadata(typeof(SortViewColumn),
-			//	new FrameworkPropertyMetadata(Application.Current.FindResource(SortListView.ColumnHeaderContainerStyleKey)));
-			//CellTemplateProperty.OverrideMetadata(typeof(SortViewColumn),
-			//	new FrameworkPropertyMetadata(SortListView.CellTemplateKey));
-			//HeaderContainerStyleProperty.OverrideMetadata(typeof(SortViewColumn),
-			//	new FrameworkPropertyMetadata(SortViewKeys.HeaderContainerLeftAlignStyle));
-			/*CellTemplateProperty.OverrideMetadata(typeof(SortViewColumn),
+    public DataTemplate CellDataTemplate
+    {
+        get => (DataTemplate)GetValue(CellDataTemplateProperty);
+        set => SetValue(CellDataTemplateProperty, value);
+    }
+
+    static SortViewColumn()
+    {
+        //HeaderContainerStyleProperty.OverrideMetadata(typeof(SortViewColumn),
+        //	new FrameworkPropertyMetadata(Application.Current.FindResource(SortListView.ColumnHeaderContainerStyleKey)));
+        //CellTemplateProperty.OverrideMetadata(typeof(SortViewColumn),
+        //	new FrameworkPropertyMetadata(SortListView.CellTemplateKey));
+        //HeaderContainerStyleProperty.OverrideMetadata(typeof(SortViewColumn),
+        //	new FrameworkPropertyMetadata(SortViewKeys.HeaderContainerLeftAlignStyle));
+        /*CellTemplateProperty.OverrideMetadata(typeof(SortViewColumn),
 				new FrameworkPropertyMetadata(typeof(SortViewColumn)));*/
-		}
+    }
 
-		public SortViewColumn() {
-			HeaderContainerStyle = SortViewKeys.HeaderContainerLeftAlignStyle;
-			//if (SortViewKeys.HeaderContainerLeftAlignStyle == null)
-			//	throw new InvalidOperationException("HALP!");
-			/*SetValue(HeaderContainerStyleProperty,
+    public SortViewColumn()
+    {
+        HeaderContainerStyle = SortViewKeys.HeaderContainerLeftAlignStyle;
+        //if (SortViewKeys.HeaderContainerLeftAlignStyle == null)
+        //	throw new InvalidOperationException("HALP!");
+        /*SetValue(HeaderContainerStyleProperty,
 				Activator.CreateInstance(Type.GetType(
 					"System.Windows.ResourceReferenceExpression, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"),
 					SortViewKeys.HeaderContainerLeftAlignStyleKey));*/
-		}
+    }
 
-		/*private static Style headerContainerLeftAlignStyle;
+    /*private static Style headerContainerLeftAlignStyle;
 		private static Style headerContainerCenterAlignStyle;
 		private static Style headerContainerRightAlignStyle;
 
@@ -140,41 +154,50 @@ namespace WinDirStat.Net.Wpf.Controls.SortList {
 		public static ResourceKey HeaderContainerRightAlignStyleKey { get; } =
 			new ComponentResourceKey(typeof(SortViewColumn), "HeaderContainerRightAlignStyleKey");*/
 
-		private static void OnCellDataTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			if (d is SortViewColumn column) {
-				if (column.cellBinding == null) {
-					column.CellTemplate = column.CellDataTemplate;
-				}
-			}
-		}
+    private static void OnCellDataTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is SortViewColumn column)
+        {
+            if (column.cellBinding == null)
+            {
+                column.CellTemplate = column.CellDataTemplate;
+            }
+        }
+    }
 
-		private void RebuildCellTemplate() {
-			var factory = new FrameworkElementFactory(typeof(TextBlock));
-			factory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment);
-			factory.SetValue(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis);
-			factory.SetBinding(TextBlock.TextProperty, cellBinding);
-			DataTemplate template = new DataTemplate {
-				VisualTree = factory,
-			};
-			CellTemplate = template;
-		}
+    private void RebuildCellTemplate()
+    {
+        var factory = new FrameworkElementFactory(typeof(TextBlock));
+        factory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment);
+        factory.SetValue(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis);
+        factory.SetBinding(TextBlock.TextProperty, cellBinding);
+        DataTemplate template = new DataTemplate
+        {
+            VisualTree = factory,
+        };
+        CellTemplate = template;
+    }
 
-		public BindingBase CellBinding {
-			get => cellBinding;
-			set {
-				if (cellBinding != value) {
-					cellBinding = value;
-					if (cellBinding == null) {
-						CellTemplate = CellDataTemplate;
-					}
-					else {
-						RebuildCellTemplate();
-					}
-					OnPropertyChanged(new PropertyChangedEventArgs(nameof(CellBinding)));
-				}
-			}
-		}
+    public BindingBase CellBinding
+    {
+        get => cellBinding;
+        set
+        {
+            if (cellBinding != value)
+            {
+                cellBinding = value;
+                if (cellBinding == null)
+                {
+                    CellTemplate = CellDataTemplate;
+                }
+                else
+                {
+                    RebuildCellTemplate();
+                }
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(CellBinding)));
+            }
+        }
+    }
 
-		private BindingBase cellBinding;
-	}
+    private BindingBase cellBinding;
 }

@@ -30,136 +30,175 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using WinDirStat.Net.ViewModel.Files;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public class FileTreeNodeView : Control {
-		static FileTreeNodeView() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeNodeView),
-													 new FrameworkPropertyMetadata(typeof(FileTreeNodeView)));
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-		public static readonly DependencyProperty TextBackgroundProperty =
-			DependencyProperty.Register("TextBackground", typeof(Brush), typeof(FileTreeNodeView));
+public class FileTreeNodeView : Control
+{
+    static FileTreeNodeView()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeNodeView),
+                                                 new FrameworkPropertyMetadata(typeof(FileTreeNodeView)));
+    }
 
-		public Brush TextBackground {
-			get => (Brush) GetValue(TextBackgroundProperty);
-			set => SetValue(TextBackgroundProperty, value);
-		}
+    public static readonly DependencyProperty TextBackgroundProperty =
+        DependencyProperty.Register("TextBackground", typeof(Brush), typeof(FileTreeNodeView));
 
-		public FileItemViewModel Node {
-			get { return DataContext as FileItemViewModel; }
-		}
+    public Brush TextBackground
+    {
+        get => (Brush)GetValue(TextBackgroundProperty);
+        set => SetValue(TextBackgroundProperty, value);
+    }
 
-		public FileTreeViewItem ParentItem { get; private set; }
+    public FileItemViewModel Node
+    {
+        get { return DataContext as FileItemViewModel; }
+    }
 
-		public static readonly DependencyProperty CellEditorProperty =
-			DependencyProperty.Register("CellEditor", typeof(Control), typeof(FileTreeNodeView),
-										new FrameworkPropertyMetadata());
+    public FileTreeViewItem ParentItem { get; private set; }
 
-		public Control CellEditor {
-			get => (Control) GetValue(CellEditorProperty);
-			set => SetValue(CellEditorProperty, value);
-		}
+    public static readonly DependencyProperty CellEditorProperty =
+        DependencyProperty.Register("CellEditor", typeof(Control), typeof(FileTreeNodeView),
+                                    new FrameworkPropertyMetadata());
 
-		public FileTreeView ParentTreeView {
-			get { return ParentItem.ParentTreeView; }
-		}
+    public Control CellEditor
+    {
+        get => (Control)GetValue(CellEditorProperty);
+        set => SetValue(CellEditorProperty, value);
+    }
 
-		internal LinesRenderer LinesRenderer { get; private set; }
+    public FileTreeView ParentTreeView
+    {
+        get { return ParentItem.ParentTreeView; }
+    }
 
-		public override void OnApplyTemplate() {
-			base.OnApplyTemplate();
-			LinesRenderer = Template.FindName("linesRenderer", this) as LinesRenderer;
-			UpdateTemplate();
-		}
+    internal LinesRenderer LinesRenderer { get; private set; }
 
-		protected override void OnVisualParentChanged(DependencyObject oldParent) {
-			base.OnVisualParentChanged(oldParent);
-			ParentItem = this.FindAncestor<FileTreeViewItem>();
-			ParentItem.NodeView = this;
-		}
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+        LinesRenderer = Template.FindName("linesRenderer", this) as LinesRenderer;
+        UpdateTemplate();
+    }
 
-		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
-			base.OnPropertyChanged(e);
-			if (e.Property == DataContextProperty) {
-				UpdateDataContext(e.OldValue as FileItemViewModel, e.NewValue as FileItemViewModel);
-			}
-		}
+    protected override void OnVisualParentChanged(DependencyObject oldParent)
+    {
+        base.OnVisualParentChanged(oldParent);
+        ParentItem = this.FindAncestor<FileTreeViewItem>();
+        ParentItem.NodeView = this;
+    }
 
-		void UpdateDataContext(FileItemViewModel oldNode, FileItemViewModel newNode) {
-			if (newNode != null) {
-				newNode.PropertyChanged += Node_PropertyChanged;
-				if (Template != null) {
-					UpdateTemplate();
-				}
-			}
-			if (oldNode != null) {
-				oldNode.PropertyChanged -= Node_PropertyChanged;
-			}
-		}
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == DataContextProperty)
+        {
+            UpdateDataContext(e.OldValue as FileItemViewModel, e.NewValue as FileItemViewModel);
+        }
+    }
 
-		void Node_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-			if (e.PropertyName == nameof(FileItemViewModel.IsEditing)) {
-				OnIsEditingChanged();
-			}
-			else if (e.PropertyName == nameof(FileItemViewModel.IsLast)) {
-				if (ParentTreeView.ShowLines) {
-					foreach (var child in Node.VisibleDescendantsAndSelf()) {
-						var container = ParentTreeView.ItemContainerGenerator.ContainerFromItem(child) as FileTreeViewItem;
-						if (container != null) {
-							container.NodeView.LinesRenderer.InvalidateVisual();
-						}
-					}
-				}
-			}
-			else if (e.PropertyName == nameof(FileItemViewModel.IsExpanded)) {
-				if (Node.IsExpanded)
-					ParentTreeView.HandleExpanding(Node);
-			}
-		}
+    void UpdateDataContext(FileItemViewModel oldNode, FileItemViewModel newNode)
+    {
+        if (newNode != null)
+        {
+            newNode.PropertyChanged += Node_PropertyChanged;
+            if (Template != null)
+            {
+                UpdateTemplate();
+            }
+        }
+        if (oldNode != null)
+        {
+            oldNode.PropertyChanged -= Node_PropertyChanged;
+        }
+    }
 
-		void OnIsEditingChanged() {
-			var textEditorContainer = Template.FindName("textEditorContainer", this) as Border;
-			if (Node.IsEditing) {
-				if (CellEditor == null)
-					textEditorContainer.Child = new EditTextBox() { Item = ParentItem };
-				else
-					textEditorContainer.Child = CellEditor;
-			}
-			else {
-				textEditorContainer.Child = null;
-			}
-		}
+    void Node_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FileItemViewModel.IsEditing))
+        {
+            OnIsEditingChanged();
+        }
+        else if (e.PropertyName == nameof(FileItemViewModel.IsLast))
+        {
+            if (ParentTreeView.ShowLines)
+            {
+                foreach (var child in Node.VisibleDescendantsAndSelf())
+                {
+                    var container = ParentTreeView.ItemContainerGenerator.ContainerFromItem(child) as FileTreeViewItem;
+                    if (container != null)
+                    {
+                        container.NodeView.LinesRenderer.InvalidateVisual();
+                    }
+                }
+            }
+        }
+        else if (e.PropertyName == nameof(FileItemViewModel.IsExpanded))
+        {
+            if (Node.IsExpanded)
+            {
+                ParentTreeView.HandleExpanding(Node);
+            }
+        }
+    }
 
-		void UpdateTemplate() {
-			var spacer = Template.FindName("spacer", this) as FrameworkElement;
-			spacer.Width = CalculateIndent();
+    void OnIsEditingChanged()
+    {
+        var textEditorContainer = Template.FindName("textEditorContainer", this) as Border;
+        if (Node.IsEditing)
+        {
+            if (CellEditor == null)
+            {
+                textEditorContainer.Child = new EditTextBox() { Item = ParentItem };
+            }
+            else
+            {
+                textEditorContainer.Child = CellEditor;
+            }
+        }
+        else
+        {
+            textEditorContainer.Child = null;
+        }
+    }
 
-			var expander = Template.FindName("expander", this) as ToggleButton;
-			if (ParentTreeView.Root == Node && !ParentTreeView.ShowRootExpander) {
-				expander.Visibility = Visibility.Collapsed;
-			}
-			else {
-				expander.ClearValue(VisibilityProperty);
-			}
-		}
+    void UpdateTemplate()
+    {
+        var spacer = Template.FindName("spacer", this) as FrameworkElement;
+        spacer.Width = CalculateIndent();
 
-		internal double CalculateIndent() {
-			int result = 18 * Node.Level;
-			if (ParentTreeView.ShowRoot) {
-				if (!ParentTreeView.ShowRootExpander) {
-					if (ParentTreeView.Root != Node) {
-						result -= 15;
-					}
-				}
-			}
-			else {
-				result -= 19;
-			}
-			if (result < 0) {
-				Debug.WriteLine("Negative indent level detected for node " + Node);
-				result = 0;
-			}
-			return result;
-		}
-	}
+        var expander = Template.FindName("expander", this) as ToggleButton;
+        if (ParentTreeView.Root == Node && !ParentTreeView.ShowRootExpander)
+        {
+            expander.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            expander.ClearValue(VisibilityProperty);
+        }
+    }
+
+    internal double CalculateIndent()
+    {
+        int result = 18 * Node.Level;
+        if (ParentTreeView.ShowRoot)
+        {
+            if (!ParentTreeView.ShowRootExpander)
+            {
+                if (ParentTreeView.Root != Node)
+                {
+                    result -= 15;
+                }
+            }
+        }
+        else
+        {
+            result -= 19;
+        }
+        if (result < 0)
+        {
+            Debug.WriteLine("Negative indent level detected for node " + Node);
+            result = 0;
+        }
+        return result;
+    }
 }

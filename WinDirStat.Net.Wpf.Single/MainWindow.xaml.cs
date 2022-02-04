@@ -15,63 +15,74 @@ using WinDirStat.Net.ViewModel;
 using WinDirStat.Net.ViewModel.Extensions;
 using WinDirStat.Net.ViewModel.Files;
 
-namespace WinDirStat.Net.Wpf {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window {
+namespace WinDirStat.Net.Wpf;
 
-		#region Constructors
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
+{
 
-		/// <summary>Constructs the <see cref="DriveSelectDialog"/>.</summary>
-		public MainWindow() {
-			InitializeComponent();
-		}
+    #region Constructors
 
-		#endregion
+    /// <summary>Constructs the <see cref="DriveSelectDialog"/>.</summary>
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
 
-		#region Properties
+    #endregion
 
-		/// <summary>Gets the <see cref="MainViewModel"/>.</summary>
-		public MainViewModel ViewModel => DataContext as MainViewModel;
+    #region Properties
 
-		#endregion
+    /// <summary>Gets the <see cref="MainViewModel"/>.</summary>
+    public MainViewModel ViewModel => DataContext as MainViewModel;
 
-		#region Event Handlers
+    #endregion
 
-		private void OnLoaded(object sender, RoutedEventArgs e) {
-			ViewModel.WindowOwner = this;
-		}
+    #region Event Handlers
 
-		private void OnFileSelectionChanged(object sender, SelectionChangedEventArgs e) {
-			OnFileTreeGotFocus(sender, e);
-		}
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.WindowOwner = this;
+    }
 
-		private void OnExtensionSelectionChanged(object sender, SelectionChangedEventArgs e) {
-			OnExtensionListGotFocus(sender, e);
-		}
+    private void OnFileSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        OnFileTreeGotFocus(sender, e);
+    }
 
-		private void OnFileTreeGotFocus(object sender, RoutedEventArgs e) {
-			if (tree.SelectedItems.Count > 0 && ViewModel.IsOpen) {
-				graphView.HighlightSelection(tree.SelectedItems.Cast<FileItemViewModel>().Select(v => v.Model));
-			}
-		}
+    private void OnExtensionSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        OnExtensionListGotFocus(sender, e);
+    }
 
-		private void OnExtensionListGotFocus(object sender, RoutedEventArgs e) {
-			if (extensionList.SelectedItem != null && ViewModel.IsOpen) {
-				graphView.HighlightExtension(((ExtensionItemViewModel) extensionList.SelectedItem).Extension);
-			}
-		}
-		private void OnGraphFileSelected(object sender, MouseButtonEventArgs e) {
-			if (graphView.HasHover) {
-				FileItemViewModel view = ViewModel.RootItem.FindView(graphView.Hover, true);
-				tree.FocusNode(view);
-				tree.SelectedItem = view;
-				//tree.Focus();
-				//Keyboard.Focus(tree);
-			}
-		}
+    private void OnFileTreeGotFocus(object sender, RoutedEventArgs e)
+    {
+        if (tree.SelectedItems.Count > 0 && ViewModel.IsOpen)
+        {
+            graphView.HighlightSelection(tree.SelectedItems.Cast<FileItemViewModel>().Select(v => v.Model));
+        }
+    }
 
-		#endregion
-	}
+    private void OnExtensionListGotFocus(object sender, RoutedEventArgs e)
+    {
+        if (extensionList.SelectedItem != null && ViewModel.IsOpen)
+        {
+            graphView.HighlightExtension(((ExtensionItemViewModel)extensionList.SelectedItem).Extension);
+        }
+    }
+    private void OnGraphFileSelected(object sender, MouseButtonEventArgs e)
+    {
+        if (graphView.HasHover)
+        {
+            FileItemViewModel view = ViewModel.RootItem.FindView(graphView.Hover, true);
+            tree.FocusNode(view);
+            tree.SelectedItem = view;
+            //tree.Focus();
+            //Keyboard.Focus(tree);
+        }
+    }
+
+    #endregion
 }

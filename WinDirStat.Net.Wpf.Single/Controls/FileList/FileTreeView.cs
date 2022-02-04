@@ -35,355 +35,433 @@ using WinDirStat.Net.Wpf.Controls.SortList;
 using WinDirStat.Net.Utils;
 using WinDirStat.Net.ViewModel.Files;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public class FileTreeView : SortListView {
-		static FileTreeView() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeView),
-													 new FrameworkPropertyMetadata(typeof(FileTreeView)));
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-			SelectionModeProperty.OverrideMetadata(typeof(FileTreeView),
-												   new FrameworkPropertyMetadata(SelectionMode.Extended));
+public class FileTreeView : SortListView
+{
+    static FileTreeView()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeView),
+                                                 new FrameworkPropertyMetadata(typeof(FileTreeView)));
 
-			AlternationCountProperty.OverrideMetadata(typeof(FileTreeView),
-													  new FrameworkPropertyMetadata(2));
+        SelectionModeProperty.OverrideMetadata(typeof(FileTreeView),
+                                               new FrameworkPropertyMetadata(SelectionMode.Extended));
 
-			DefaultItemContainerStyleKey =
-				new ComponentResourceKey(typeof(FileTreeView), "DefaultItemContainerStyleKey");
+        AlternationCountProperty.OverrideMetadata(typeof(FileTreeView),
+                                                  new FrameworkPropertyMetadata(2));
 
-			VirtualizingStackPanel.VirtualizationModeProperty.OverrideMetadata(typeof(FileTreeView),
-																			   new FrameworkPropertyMetadata(VirtualizationMode.Recycling));
+        DefaultItemContainerStyleKey =
+            new ComponentResourceKey(typeof(FileTreeView), "DefaultItemContainerStyleKey");
 
-			RegisterCommands();
-		}
+        VirtualizingStackPanel.VirtualizationModeProperty.OverrideMetadata(typeof(FileTreeView),
+                                                                           new FrameworkPropertyMetadata(VirtualizationMode.Recycling));
 
-		public static readonly RoutedEvent ActivateEvent =
-			EventManager.RegisterRoutedEvent("Activate", RoutingStrategy.Bubble,
-				typeof(RoutedEventHandler), typeof(FileTreeView));
+        RegisterCommands();
+    }
 
-		public event RoutedEventHandler Activate {
-			add => AddHandler(ActivateEvent, value);
-			remove => RemoveHandler(ActivateEvent, value);
-		}
+    public static readonly RoutedEvent ActivateEvent =
+        EventManager.RegisterRoutedEvent("Activate", RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler), typeof(FileTreeView));
 
-		public static ResourceKey DefaultItemContainerStyleKey { get; private set; }
+    public event RoutedEventHandler Activate
+    {
+        add => AddHandler(ActivateEvent, value);
+        remove => RemoveHandler(ActivateEvent, value);
+    }
 
-		public FileTreeView() {
-			SetResourceReference(ItemContainerStyleProperty, DefaultItemContainerStyleKey);
-		}
+    public static ResourceKey DefaultItemContainerStyleKey { get; private set; }
 
-		public static readonly DependencyProperty RootProperty =
-			DependencyProperty.Register("Root", typeof(FileItemViewModel), typeof(FileTreeView));
+    public FileTreeView()
+    {
+        SetResourceReference(ItemContainerStyleProperty, DefaultItemContainerStyleKey);
+    }
 
-		public FileItemViewModel Root {
-			get => (FileItemViewModel) GetValue(RootProperty);
-			set => SetValue(RootProperty, value);
-		}
+    public static readonly DependencyProperty RootProperty =
+        DependencyProperty.Register("Root", typeof(FileItemViewModel), typeof(FileTreeView));
 
-		public static readonly DependencyProperty ShowRootProperty =
-			DependencyProperty.Register("ShowRoot", typeof(bool), typeof(FileTreeView),
-										new FrameworkPropertyMetadata(true));
+    public FileItemViewModel Root
+    {
+        get => (FileItemViewModel)GetValue(RootProperty);
+        set => SetValue(RootProperty, value);
+    }
 
-		public bool ShowRoot {
-			get => (bool) GetValue(ShowRootProperty);
-			set => SetValue(ShowRootProperty, value);
-		}
+    public static readonly DependencyProperty ShowRootProperty =
+        DependencyProperty.Register("ShowRoot", typeof(bool), typeof(FileTreeView),
+                                    new FrameworkPropertyMetadata(true));
 
-		public static readonly DependencyProperty ShowRootExpanderProperty =
-			DependencyProperty.Register("ShowRootExpander", typeof(bool), typeof(FileTreeView),
-										new FrameworkPropertyMetadata(false));
+    public bool ShowRoot
+    {
+        get => (bool)GetValue(ShowRootProperty);
+        set => SetValue(ShowRootProperty, value);
+    }
 
-		public bool ShowRootExpander {
-			get => (bool) GetValue(ShowRootExpanderProperty);
-			set => SetValue(ShowRootExpanderProperty, value);
-		}
+    public static readonly DependencyProperty ShowRootExpanderProperty =
+        DependencyProperty.Register("ShowRootExpander", typeof(bool), typeof(FileTreeView),
+                                    new FrameworkPropertyMetadata(false));
 
-		public static readonly DependencyProperty AllowDropOrderProperty =
-			DependencyProperty.Register("AllowDropOrder", typeof(bool), typeof(FileTreeView));
+    public bool ShowRootExpander
+    {
+        get => (bool)GetValue(ShowRootExpanderProperty);
+        set => SetValue(ShowRootExpanderProperty, value);
+    }
 
-		public bool AllowDropOrder {
-			get => (bool) GetValue(AllowDropOrderProperty);
-			set => SetValue(AllowDropOrderProperty, value);
-		}
+    public static readonly DependencyProperty AllowDropOrderProperty =
+        DependencyProperty.Register("AllowDropOrder", typeof(bool), typeof(FileTreeView));
 
-		public static readonly DependencyProperty ShowLinesProperty =
-			DependencyProperty.Register("ShowLines", typeof(bool), typeof(FileTreeView),
-										new FrameworkPropertyMetadata(true));
+    public bool AllowDropOrder
+    {
+        get => (bool)GetValue(AllowDropOrderProperty);
+        set => SetValue(AllowDropOrderProperty, value);
+    }
 
-		public bool ShowLines {
-			get => (bool) GetValue(ShowLinesProperty);
-			set => SetValue(ShowLinesProperty, value);
-		}
+    public static readonly DependencyProperty ShowLinesProperty =
+        DependencyProperty.Register("ShowLines", typeof(bool), typeof(FileTreeView),
+                                    new FrameworkPropertyMetadata(true));
 
-		public static bool GetShowAlternation(DependencyObject obj) {
-			return (bool) obj.GetValue(ShowAlternationProperty);
-		}
+    public bool ShowLines
+    {
+        get => (bool)GetValue(ShowLinesProperty);
+        set => SetValue(ShowLinesProperty, value);
+    }
 
-		public static void SetShowAlternation(DependencyObject obj, bool value) {
-			obj.SetValue(ShowAlternationProperty, value);
-		}
+    public static bool GetShowAlternation(DependencyObject obj)
+    {
+        return (bool)obj.GetValue(ShowAlternationProperty);
+    }
 
-		public static readonly DependencyProperty ShowAlternationProperty =
-			DependencyProperty.RegisterAttached("ShowAlternation", typeof(bool), typeof(FileTreeView),
-												new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
+    public static void SetShowAlternation(DependencyObject obj, bool value)
+    {
+        obj.SetValue(ShowAlternationProperty, value);
+    }
 
-		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e) {
-			base.OnPropertyChanged(e);
-			if (e.Property == RootProperty ||
-				e.Property == ShowRootProperty ||
-				e.Property == ShowRootExpanderProperty) {
-				Reload();
-			}
-		}
+    public static readonly DependencyProperty ShowAlternationProperty =
+        DependencyProperty.RegisterAttached("ShowAlternation", typeof(bool), typeof(FileTreeView),
+                                            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
 
-		FileTreeFlattener flattener;
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == RootProperty ||
+            e.Property == ShowRootProperty ||
+            e.Property == ShowRootExpanderProperty)
+        {
+            Reload();
+        }
+    }
 
-		void Reload() {
-			if (flattener != null) {
-				flattener.Stop();
-				flattener = null;
-			}
-			if (Root != null) {
-				if (!(ShowRoot && ShowRootExpander)) {
-					Root.IsExpanded = true;
-				}
-				flattener = new FileTreeFlattener(Root, ShowRoot);
-				flattener.CollectionChanged += Flattener_CollectionChanged;
-				this.ItemsSource = flattener;
-			}
-			else {
-				this.ItemsSource = null;
-			}
-		}
+    FileTreeFlattener flattener;
 
-		void Flattener_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-			// Deselect nodes that are being hidden, if any remain in the tree
-			if (e.Action == NotifyCollectionChangedAction.Remove && Items.Count > 0) {
-				List<FileItemViewModel> selectedOldItems = null;
-				foreach (FileItemViewModel node in e.OldItems) {
-					if (node.IsSelected) {
-						if (selectedOldItems == null)
-							selectedOldItems = new List<FileItemViewModel>();
-						selectedOldItems.Add(node);
-					}
-				}
-				if (selectedOldItems != null) {
-					var list = SelectedItems.Cast<FileItemViewModel>().Except(selectedOldItems).ToList();
-					SetSelectedItems(list);
-					if (SelectedItem == null && this.IsKeyboardFocusWithin) {
-						// if we removed all selected nodes, then move the focus to the node
-						// preceding the first of the old selected nodes
-						SelectedIndex = Math.Max(0, e.OldStartingIndex - 1);
-						if (SelectedIndex >= 0)
-							FocusNode((FileItemViewModel) SelectedItem);
-					}
-				}
-			}
-		}
+    void Reload()
+    {
+        if (flattener != null)
+        {
+            flattener.Stop();
+            flattener = null;
+        }
+        if (Root != null)
+        {
+            if (!(ShowRoot && ShowRootExpander))
+            {
+                Root.IsExpanded = true;
+            }
+            flattener = new FileTreeFlattener(Root, ShowRoot);
+            flattener.CollectionChanged += Flattener_CollectionChanged;
+            this.ItemsSource = flattener;
+        }
+        else
+        {
+            this.ItemsSource = null;
+        }
+    }
 
-		protected override DependencyObject GetContainerForItemOverride() {
-			return new FileTreeViewItem();
-		}
+    void Flattener_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Deselect nodes that are being hidden, if any remain in the tree
+        if (e.Action == NotifyCollectionChangedAction.Remove && Items.Count > 0)
+        {
+            List<FileItemViewModel> selectedOldItems = null;
+            foreach (FileItemViewModel node in e.OldItems)
+            {
+                if (node.IsSelected)
+                {
+                    if (selectedOldItems == null)
+                    {
+                        selectedOldItems = new List<FileItemViewModel>();
+                    }
 
-		protected override bool IsItemItsOwnContainerOverride(object item) {
-			return item is FileTreeViewItem;
-		}
+                    selectedOldItems.Add(node);
+                }
+            }
+            if (selectedOldItems != null)
+            {
+                var list = SelectedItems.Cast<FileItemViewModel>().Except(selectedOldItems).ToList();
+                SetSelectedItems(list);
+                if (SelectedItem == null && this.IsKeyboardFocusWithin)
+                {
+                    // if we removed all selected nodes, then move the focus to the node
+                    // preceding the first of the old selected nodes
+                    SelectedIndex = Math.Max(0, e.OldStartingIndex - 1);
+                    if (SelectedIndex >= 0)
+                    {
+                        FocusNode((FileItemViewModel)SelectedItem);
+                    }
+                }
+            }
+        }
+    }
 
-		protected override void PrepareContainerForItemOverride(DependencyObject element, object item) {
-			base.PrepareContainerForItemOverride(element, item);
-			FileTreeViewItem container = element as FileTreeViewItem;
-			container.ParentTreeView = this;
-			// Make sure that the line renderer takes into account the new bound data
-			if (container.NodeView != null) {
-				container.NodeView.LinesRenderer.InvalidateVisual();
-			}
-		}
+    protected override DependencyObject GetContainerForItemOverride()
+    {
+        return new FileTreeViewItem();
+    }
 
-		bool doNotScrollOnExpanding;
+    protected override bool IsItemItsOwnContainerOverride(object item)
+    {
+        return item is FileTreeViewItem;
+    }
 
-		/// <summary>
-		/// Handles the node expanding event in the tree view.
-		/// This method gets called only if the node is in the visible region (a SharpTreeNodeView exists).
-		/// </summary>
-		internal void HandleExpanding(FileItemViewModel node) {
-			if (doNotScrollOnExpanding)
-				return;
-			/*FileNode lastVisibleChild = node;
-			while (true) {
-				FileNode tmp = lastVisibleChild.Children.LastOrDefault(c => c.IsVisible);
-				if (tmp != null) {
-					lastVisibleChild = tmp;
-				}
-				else {
-					break;
-				}
-			}
-			if (lastVisibleChild != node) {
-				// Make the the expanded children are visible; but don't scroll down
-				// to much (keep node itself visible)
-				base.ScrollIntoView(lastVisibleChild);
-				// For some reason, this only works properly when delaying it...
-				Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(
-					delegate {
-						base.ScrollIntoView(node);
-					}));
-			}*/
-		}
+    protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+    {
+        base.PrepareContainerForItemOverride(element, item);
+        FileTreeViewItem container = element as FileTreeViewItem;
+        container.ParentTreeView = this;
+        // Make sure that the line renderer takes into account the new bound data
+        if (container.NodeView != null)
+        {
+            container.NodeView.LinesRenderer.InvalidateVisual();
+        }
+    }
 
-		protected override void OnKeyDown(KeyEventArgs e) {
-			FileItemViewModel selectedItem = null;
-			if (e.OriginalSource is FileTreeViewItem container &&
-				ItemsControl.ItemsControlFromItemContainer(container) == this)
-			{
-				selectedItem = container.Node;
-			}
-			else if (e.OriginalSource == this) {
-				// When the FileTreeFlattener collection is reset, focus will be shifted to the FileTreeView.
-				selectedItem = SelectedItem as FileItemViewModel;
-				if (selectedItem != null)
-					FocusNode(selectedItem);
-			}
-			else {
-				// If we're reaching this, then we may be in some subcontrol of a file item, that control may want
-				// focus. We'll keep this uncommented out for now until we determine handling needs to be changed.
-				selectedItem = SelectedItem as FileItemViewModel;
-				if (selectedItem != null)
-					FocusNode(selectedItem);
-			}
+    bool doNotScrollOnExpanding;
 
-			if (selectedItem != null) {
-				switch (e.Key) {
-				case Key.Left:
-					if (selectedItem.IsExpanded) {
-						selectedItem.IsExpanded = false;
-					}
-					else if (selectedItem.Parent != null) {
-						FocusNode(selectedItem.Parent);
-					}
-					e.Handled = true;
-					break;
-				case Key.Right:
-					if (!selectedItem.IsExpanded && selectedItem.ShowExpander) {
-						selectedItem.IsExpanded = true;
-					}
-					else if (selectedItem.Children.Count > 0) {
-						// jump to first child:
-						var firstChild = selectedItem.Children.FirstOrDefault();
-						if (firstChild != null) {
-							FocusNode(firstChild);
-						}
-					}
-					e.Handled = true;
-					break;
-				case Key.Return:
-				case Key.Space:
-					if (Keyboard.Modifiers == ModifierKeys.None && SelectedItems.Count == 1) {
-						e.Handled = true;
-						selectedItem.ActivateItem();
-					}
-					break;
-				/*case Key.Space:
-					// Normally Space has special functionality, but we don't support checkboxes.
-					e.Handled = true;
-					selectedItem.ActivateItem();
-					if (Keyboard.Modifiers == ModifierKeys.None && SelectedItems.Count == 1) {
-						e.Handled = true;
-						if (selectedItem.IsCheckable) {
-							// If partially selected, we want to select everything
-							selectedItem.IsChecked = !(selectedItem.IsChecked ?? false);
-						}
-						else {
-							selectedItem.ActivateItem();
-						}
-					}
-					break;*/
-				case Key.Add:
-					if (selectedItem.ShowExpander) {
-						selectedItem.IsExpanded = true;
-					}
-					e.Handled = true;
-					break;
-				case Key.Subtract:
-					selectedItem.IsExpanded = false;
-					e.Handled = true;
-					break;
-				case Key.Multiply:
-					if (selectedItem.ShowExpander) {
-						selectedItem.IsExpanded = true;
-						ExpandRecursively(selectedItem);
-					}
-					e.Handled = true;
-					break;
-				case Key.Divide:
-					if (selectedItem.Parent != null) {
-						FocusNode(selectedItem.Parent);
-					}
-					e.Handled = true;
-					break;
-				}
-			}
-			if (!e.Handled)
-				base.OnKeyDown(e);
-		}
+    /// <summary>
+    /// Handles the node expanding event in the tree view.
+    /// This method gets called only if the node is in the visible region (a SharpTreeNodeView exists).
+    /// </summary>
+    internal void HandleExpanding(FileItemViewModel node)
+    {
+        if (doNotScrollOnExpanding)
+        {
+            return;
+        }
+        /*FileNode lastVisibleChild = node;
+while (true) {
+FileNode tmp = lastVisibleChild.Children.LastOrDefault(c => c.IsVisible);
+if (tmp != null) {
+   lastVisibleChild = tmp;
+}
+else {
+   break;
+}
+}
+if (lastVisibleChild != node) {
+// Make the the expanded children are visible; but don't scroll down
+// to much (keep node itself visible)
+base.ScrollIntoView(lastVisibleChild);
+// For some reason, this only works properly when delaying it...
+Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(
+   delegate {
+       base.ScrollIntoView(node);
+   }));
+}*/
+    }
 
-		void ExpandRecursively(FileItemViewModel node) {
-			if (node.CanExpandRecursively) {
-				node.IsExpanded = true;
-				foreach (FileItemViewModel child in node.Children) {
-					ExpandRecursively(child);
-				}
-			}
-		}
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        FileItemViewModel selectedItem = null;
+        if (e.OriginalSource is FileTreeViewItem container &&
+            ItemsControl.ItemsControlFromItemContainer(container) == this)
+        {
+            selectedItem = container.Node;
+        }
+        else if (e.OriginalSource == this)
+        {
+            // When the FileTreeFlattener collection is reset, focus will be shifted to the FileTreeView.
+            selectedItem = SelectedItem as FileItemViewModel;
+            if (selectedItem != null)
+            {
+                FocusNode(selectedItem);
+            }
+        }
+        else
+        {
+            // If we're reaching this, then we may be in some subcontrol of a file item, that control may want
+            // focus. We'll keep this uncommented out for now until we determine handling needs to be changed.
+            selectedItem = SelectedItem as FileItemViewModel;
+            if (selectedItem != null)
+            {
+                FocusNode(selectedItem);
+            }
+        }
 
-		/// <summary>
-		/// Scrolls the specified node in view and sets keyboard focus on it.
-		/// </summary>
-		public void FocusNode(FileItemViewModel node) {
-			if (node == null)
-				throw new ArgumentNullException("node");
-			ScrollIntoView(node);
-			// WPF's ScrollIntoView() uses the same if/dispatcher construct, so we call OnFocusItem() after the item was brought into view.
-			if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated) {
-				OnFocusItem(node);
-			}
-			else {
-				this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new DispatcherOperationCallback(this.OnFocusItem), node);
-			}
-		}
+        if (selectedItem != null)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    if (selectedItem.IsExpanded)
+                    {
+                        selectedItem.IsExpanded = false;
+                    }
+                    else if (selectedItem.Parent != null)
+                    {
+                        FocusNode(selectedItem.Parent);
+                    }
+                    e.Handled = true;
+                    break;
+                case Key.Right:
+                    if (!selectedItem.IsExpanded && selectedItem.ShowExpander)
+                    {
+                        selectedItem.IsExpanded = true;
+                    }
+                    else if (selectedItem.Children.Count > 0)
+                    {
+                        // jump to first child:
+                        var firstChild = selectedItem.Children.FirstOrDefault();
+                        if (firstChild != null)
+                        {
+                            FocusNode(firstChild);
+                        }
+                    }
+                    e.Handled = true;
+                    break;
+                case Key.Return:
+                case Key.Space:
+                    if (Keyboard.Modifiers == ModifierKeys.None && SelectedItems.Count == 1)
+                    {
+                        e.Handled = true;
+                        selectedItem.ActivateItem();
+                    }
+                    break;
+                /*case Key.Space:
+                    // Normally Space has special functionality, but we don't support checkboxes.
+                    e.Handled = true;
+                    selectedItem.ActivateItem();
+                    if (Keyboard.Modifiers == ModifierKeys.None && SelectedItems.Count == 1) {
+                        e.Handled = true;
+                        if (selectedItem.IsCheckable) {
+                            // If partially selected, we want to select everything
+                            selectedItem.IsChecked = !(selectedItem.IsChecked ?? false);
+                        }
+                        else {
+                            selectedItem.ActivateItem();
+                        }
+                    }
+                    break;*/
+                case Key.Add:
+                    if (selectedItem.ShowExpander)
+                    {
+                        selectedItem.IsExpanded = true;
+                    }
+                    e.Handled = true;
+                    break;
+                case Key.Subtract:
+                    selectedItem.IsExpanded = false;
+                    e.Handled = true;
+                    break;
+                case Key.Multiply:
+                    if (selectedItem.ShowExpander)
+                    {
+                        selectedItem.IsExpanded = true;
+                        ExpandRecursively(selectedItem);
+                    }
+                    e.Handled = true;
+                    break;
+                case Key.Divide:
+                    if (selectedItem.Parent != null)
+                    {
+                        FocusNode(selectedItem.Parent);
+                    }
+                    e.Handled = true;
+                    break;
+            }
+        }
+        if (!e.Handled)
+        {
+            base.OnKeyDown(e);
+        }
+    }
 
-		public void ScrollIntoView(FileItemViewModel node) {
-			if (node == null)
-				throw new ArgumentNullException("node");
-			doNotScrollOnExpanding = true;
-			foreach (FileItemViewModel ancestor in node.Ancestors())
-				ancestor.IsExpanded = true;
-			doNotScrollOnExpanding = false;
-			base.ScrollIntoView(node);
-		}
+    void ExpandRecursively(FileItemViewModel node)
+    {
+        if (node.CanExpandRecursively)
+        {
+            node.IsExpanded = true;
+            foreach (FileItemViewModel child in node.Children)
+            {
+                ExpandRecursively(child);
+            }
+        }
+    }
 
-		object OnFocusItem(object item) {
-			if (ItemContainerGenerator.ContainerFromItem(item) is FrameworkElement element) {
-				element.Focus();
-				Keyboard.Focus(element);
-			}
-			return null;
-		}
+    /// <summary>
+    /// Scrolls the specified node in view and sets keyboard focus on it.
+    /// </summary>
+    public void FocusNode(FileItemViewModel node)
+    {
+        if (node == null)
+        {
+            throw new ArgumentNullException("node");
+        }
 
-		#region Track selection
+        ScrollIntoView(node);
+        // WPF's ScrollIntoView() uses the same if/dispatcher construct, so we call OnFocusItem() after the item was brought into view.
+        if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+        {
+            OnFocusItem(node);
+        }
+        else
+        {
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new DispatcherOperationCallback(this.OnFocusItem), node);
+        }
+    }
 
-		protected override void OnSelectionChanged(SelectionChangedEventArgs e) {
-			foreach (FileItemViewModel node in e.RemovedItems) {
-				node.IsSelected = false;
-			}
-			foreach (FileItemViewModel node in e.AddedItems) {
-				node.IsSelected = true;
-			}
-			base.OnSelectionChanged(e);
-		}
+    public void ScrollIntoView(FileItemViewModel node)
+    {
+        if (node == null)
+        {
+            throw new ArgumentNullException("node");
+        }
 
-		#endregion
+        doNotScrollOnExpanding = true;
+        foreach (FileItemViewModel ancestor in node.Ancestors())
+        {
+            ancestor.IsExpanded = true;
+        }
 
-		#region Drag and Drop (Disabled)
-		/*protected override void OnDragEnter(DragEventArgs e) {
+        doNotScrollOnExpanding = false;
+        base.ScrollIntoView(node);
+    }
+
+    object OnFocusItem(object item)
+    {
+        if (ItemContainerGenerator.ContainerFromItem(item) is FrameworkElement element)
+        {
+            element.Focus();
+            Keyboard.Focus(element);
+        }
+        return null;
+    }
+
+    #region Track selection
+
+    protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+    {
+        foreach (FileItemViewModel node in e.RemovedItems)
+        {
+            node.IsSelected = false;
+        }
+        foreach (FileItemViewModel node in e.AddedItems)
+        {
+            node.IsSelected = true;
+        }
+        base.OnSelectionChanged(e);
+    }
+
+    #endregion
+
+    #region Drag and Drop (Disabled)
+    /*protected override void OnDragEnter(DragEventArgs e) {
 			OnDragOver(e);
 		}
 
@@ -625,12 +703,13 @@ namespace WinDirStat.Net.Wpf.Controls.FileList {
 				previewNodeView = null;
 			}
 		}*/
-		#endregion
+    #endregion
 
-		#region Cut / Copy / Paste / Delete Commands (Disabled)
+    #region Cut / Copy / Paste / Delete Commands (Disabled)
 
-		static void RegisterCommands() {
-			/*CommandManager.RegisterClassCommandBinding(typeof(WinDirTreeView),
+    static void RegisterCommands()
+    {
+        /*CommandManager.RegisterClassCommandBinding(typeof(WinDirTreeView),
 													   new CommandBinding(ApplicationCommands.Cut, HandleExecuted_Cut, HandleCanExecute_Cut));
 
 			CommandManager.RegisterClassCommandBinding(typeof(WinDirTreeView),
@@ -641,9 +720,9 @@ namespace WinDirStat.Net.Wpf.Controls.FileList {
 			
 			CommandManager.RegisterClassCommandBinding(typeof(WinDirTreeView),
 													   new CommandBinding(ApplicationCommands.Delete, HandleExecuted_Delete, HandleCanExecute_Delete));*/
-		}
+    }
 
-		/*static void HandleExecuted_Cut(object sender, ExecutedRoutedEventArgs e) {
+    /*static void HandleExecuted_Cut(object sender, ExecutedRoutedEventArgs e) {
 			e.Handled = true;
 			WinDirTreeView treeView = (WinDirTreeView) sender;
 			var nodes = treeView.GetTopLevelSelection().ToArray();
@@ -712,15 +791,15 @@ namespace WinDirStat.Net.Wpf.Controls.FileList {
 			e.Handled = true;
 		}*/
 
-		/// <summary>
-		/// Gets the selected items which do not have any of their ancestors selected.
-		/// </summary>
-		public IEnumerable<FileItemViewModel> GetTopLevelSelection() {
-			var selection = this.SelectedItems.OfType<FileItemViewModel>();
-			var selectionHash = new HashSet<FileItemViewModel>(selection);
-			return selection.Where(item => item.Ancestors().All(a => !selectionHash.Contains(a)));
-		}
+    /// <summary>
+    /// Gets the selected items which do not have any of their ancestors selected.
+    /// </summary>
+    public IEnumerable<FileItemViewModel> GetTopLevelSelection()
+    {
+        var selection = this.SelectedItems.OfType<FileItemViewModel>();
+        var selectionHash = new HashSet<FileItemViewModel>(selection);
+        return selection.Where(item => item.Ancestors().All(a => !selectionHash.Contains(a)));
+    }
 
-		#endregion
-	}
+    #endregion
 }

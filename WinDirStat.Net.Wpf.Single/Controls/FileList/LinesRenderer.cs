@@ -23,46 +23,62 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	class LinesRenderer : FrameworkElement {
-		static LinesRenderer() {
-			pen = new Pen(Brushes.LightGray, 1);
-			pen.Freeze();
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-		static Pen pen;
+class LinesRenderer : FrameworkElement
+{
+    static LinesRenderer()
+    {
+        pen = new Pen(Brushes.LightGray, 1);
+        pen.Freeze();
+    }
 
-		FileTreeNodeView NodeView {
-			get { return TemplatedParent as FileTreeNodeView; }
-		}
+    static Pen pen;
 
-		protected override void OnRender(DrawingContext dc) {
-			double indent = NodeView.CalculateIndent();
-			Point p = new Point(indent + 4.5, 0);
-			double endY = Math.Floor(ActualHeight / 2) + 0.5;
+    FileTreeNodeView NodeView
+    {
+        get { return TemplatedParent as FileTreeNodeView; }
+    }
 
-			if (!NodeView.Node.IsRoot || NodeView.ParentTreeView.ShowRootExpander) {
-				dc.DrawLine(pen, new Point(p.X, endY), new Point(p.X + 10.5, endY));
-			}
+    protected override void OnRender(DrawingContext dc)
+    {
+        double indent = NodeView.CalculateIndent();
+        Point p = new Point(indent + 4.5, 0);
+        double endY = Math.Floor(ActualHeight / 2) + 0.5;
 
-			if (NodeView.Node.IsRoot) return;
+        if (!NodeView.Node.IsRoot || NodeView.ParentTreeView.ShowRootExpander)
+        {
+            dc.DrawLine(pen, new Point(p.X, endY), new Point(p.X + 10.5, endY));
+        }
 
-			if (NodeView.Node.IsLast) {
-				dc.DrawLine(pen, p, new Point(p.X, endY));
-			}
-			else {
-				dc.DrawLine(pen, p, new Point(p.X, ActualHeight));
-			}
+        if (NodeView.Node.IsRoot)
+        {
+            return;
+        }
 
-			var current = NodeView.Node;
-			while (true) {
-				p.X -= 18;
-				current = current.Parent;
-				if (p.X < 0) break;
-				if (!current.IsLast) {
-					dc.DrawLine(pen, p, new Point(p.X, ActualHeight));
-				}
-			}
-		}
-	}
+        if (NodeView.Node.IsLast)
+        {
+            dc.DrawLine(pen, p, new Point(p.X, endY));
+        }
+        else
+        {
+            dc.DrawLine(pen, p, new Point(p.X, ActualHeight));
+        }
+
+        var current = NodeView.Node;
+        while (true)
+        {
+            p.X -= 18;
+            current = current.Parent;
+            if (p.X < 0)
+            {
+                break;
+            }
+
+            if (!current.IsLast)
+            {
+                dc.DrawLine(pen, p, new Point(p.X, ActualHeight));
+            }
+        }
+    }
 }

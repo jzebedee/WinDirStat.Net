@@ -14,29 +14,38 @@ using WinDirStat.Net.Wpf.Commands;
 using WinDirStat.Net.Wpf.Utils;
 using WinDirStat.Net.Wpf.ViewModel;
 
-namespace WinDirStat.Net.Wpf.Controls {
-	public class CommandButton : ImageButton {
-		private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-			CommandButton button = (CommandButton) d;
+namespace WinDirStat.Net.Wpf.Controls;
 
-			if (e.OldValue is IRelayInfoCommand oldUICommand)
-				oldUICommand.PropertyChanged -= button.OnCommandPropertyChanged;
-			if (e.NewValue is IRelayInfoCommand newUICommand)
-				newUICommand.PropertyChanged += button.OnCommandPropertyChanged;
+public class CommandButton : ImageButton
+{
+    private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        CommandButton button = (CommandButton)d;
 
-			d.CoerceValue(SourceProperty);
-			//d.CoerceValue(ContentProperty);
-			d.CoerceValue(ToolTipProperty);
-		}
+        if (e.OldValue is IRelayInfoCommand oldUICommand)
+        {
+            oldUICommand.PropertyChanged -= button.OnCommandPropertyChanged;
+        }
 
-		private void OnCommandPropertyChanged(object sender, PropertyChangedEventArgs e) {
-			CoerceValue(SourceProperty);
-			//CoerceValue(ContentProperty);
-			CoerceValue(ToolTipProperty);
-		}
+        if (e.NewValue is IRelayInfoCommand newUICommand)
+        {
+            newUICommand.PropertyChanged += button.OnCommandPropertyChanged;
+        }
 
-		// Set the header to the command text if no header has been explicitly specified
-		/*private static object CoerceContent(DependencyObject d, object value) {
+        d.CoerceValue(SourceProperty);
+        //d.CoerceValue(ContentProperty);
+        d.CoerceValue(ToolTipProperty);
+    }
+
+    private void OnCommandPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        CoerceValue(SourceProperty);
+        //CoerceValue(ContentProperty);
+        CoerceValue(ToolTipProperty);
+    }
+
+    // Set the header to the command text if no header has been explicitly specified
+    /*private static object CoerceContent(DependencyObject d, object value) {
 			CommandButton button = (CommandButton) d;
 			RelayUICommand uiCommand;
 
@@ -49,50 +58,61 @@ namespace WinDirStat.Net.Wpf.Controls {
 		}*/
 
 
-		// Set the icon to the command text if no icon has been explicitly specified
-		private static object CoerceSource(DependencyObject d, object value) {
-			CommandButton button = (CommandButton) d;
+    // Set the icon to the command text if no icon has been explicitly specified
+    private static object CoerceSource(DependencyObject d, object value)
+    {
+        CommandButton button = (CommandButton)d;
 
-			// If no icon has been set, use the command's icon
-			if (button.IsValueUnsetAndNull(SourceProperty, value) && button.Command is IRelayInfoCommand uiCommand) {
-				value = uiCommand.Icon;
-			}
-			return value;
-		}
+        // If no icon has been set, use the command's icon
+        if (button.IsValueUnsetAndNull(SourceProperty, value) && button.Command is IRelayInfoCommand uiCommand)
+        {
+            value = uiCommand.Icon;
+        }
+        return value;
+    }
 
-		// Gets the input gesture text from the command text if it hasn't been explicitly specified
-		private static object CoerceToolTip(DependencyObject d, object value) {
-			CommandButton button = (CommandButton) d;
+    // Gets the input gesture text from the command text if it hasn't been explicitly specified
+    private static object CoerceToolTip(DependencyObject d, object value)
+    {
+        CommandButton button = (CommandButton)d;
 
-			if (button.IsValueUnsetAndNull(ToolTipProperty, value) && button.Command is IRelayInfoCommand uiCommand) {
+        if (button.IsValueUnsetAndNull(ToolTipProperty, value) && button.Command is IRelayInfoCommand uiCommand)
+        {
 
-				string tooltip = "";
-				if (!string.IsNullOrEmpty(uiCommand.Text)) {
-					tooltip += uiCommand.Text;
-					// Remove ellipses
-					if (tooltip.EndsWith("..."))
-						tooltip = tooltip.Substring(0, tooltip.Length - 3);
-				}
-				if (uiCommand.InputGesture != null) {
-					if (!string.IsNullOrEmpty(tooltip))
-						tooltip += " ";
-					tooltip += $"({uiCommand.InputGesture.GetDisplayStringForCulture(CultureInfo.CurrentCulture)})";
-				}
-				return tooltip;
-			}
+            string tooltip = "";
+            if (!string.IsNullOrEmpty(uiCommand.Text))
+            {
+                tooltip += uiCommand.Text;
+                // Remove ellipses
+                if (tooltip.EndsWith("..."))
+                {
+                    tooltip = tooltip.Substring(0, tooltip.Length - 3);
+                }
+            }
+            if (uiCommand.InputGesture != null)
+            {
+                if (!string.IsNullOrEmpty(tooltip))
+                {
+                    tooltip += " ";
+                }
 
-			return value;
-		}
+                tooltip += $"({uiCommand.InputGesture.GetDisplayStringForCulture(CultureInfo.CurrentCulture)})";
+            }
+            return tooltip;
+        }
 
-		static CommandButton() {
-			CommandProperty.AddOwner(typeof(CommandButton),
-				new FrameworkPropertyMetadata(OnCommandChanged));
-			//ContentProperty.AddOwner(typeof(CommandButton),
-			//	new FrameworkPropertyMetadata(null, CoerceContent));
-			SourceProperty.AddOwner(typeof(CommandButton),
-				new FrameworkPropertyMetadata(null, CoerceSource));
-			ToolTipProperty.AddOwner(typeof(CommandButton),
-				new FrameworkPropertyMetadata(null, CoerceToolTip));
-		}
-	}
+        return value;
+    }
+
+    static CommandButton()
+    {
+        CommandProperty.AddOwner(typeof(CommandButton),
+            new FrameworkPropertyMetadata(OnCommandChanged));
+        //ContentProperty.AddOwner(typeof(CommandButton),
+        //	new FrameworkPropertyMetadata(null, CoerceContent));
+        SourceProperty.AddOwner(typeof(CommandButton),
+            new FrameworkPropertyMetadata(null, CoerceSource));
+        ToolTipProperty.AddOwner(typeof(CommandButton),
+            new FrameworkPropertyMetadata(null, CoerceToolTip));
+    }
 }

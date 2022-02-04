@@ -25,23 +25,29 @@ using System.Windows;
 using System.Collections;
 using System.Windows.Input;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public static class ExtensionMethods {
-		public static T FindAncestor<T>(this DependencyObject d) where T : class {
-			return AncestorsAndSelf(d).OfType<T>().FirstOrDefault();
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-		public static IEnumerable<DependencyObject> AncestorsAndSelf(this DependencyObject d) {
-			while (d != null) {
-				yield return d;
-				d = VisualTreeHelper.GetParent(d);
-			}
-		}
+public static class ExtensionMethods
+{
+    public static T FindAncestor<T>(this DependencyObject d) where T : class
+    {
+        return AncestorsAndSelf(d).OfType<T>().FirstOrDefault();
+    }
 
-		public static void AddOnce(this IList list, object item) {
-			if (!list.Contains(item)) {
-				list.Add(item);
-			}
-		}
-	}
+    public static IEnumerable<DependencyObject> AncestorsAndSelf(this DependencyObject d)
+    {
+        while (d != null)
+        {
+            yield return d;
+            d = VisualTreeHelper.GetParent(d);
+        }
+    }
+
+    public static void AddOnce(this IList list, object item)
+    {
+        if (!list.Contains(item))
+        {
+            list.Add(item);
+        }
+    }
 }

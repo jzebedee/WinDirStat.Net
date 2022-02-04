@@ -12,16 +12,18 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using WinDirStat.Net.Utils;
 
-namespace WinDirStat.Net.ViewModel.Files {
-	partial class FileItemViewModel {
+namespace WinDirStat.Net.ViewModel.Files;
 
-		private bool isVisible = true;
-		/*private bool isHidden;
+partial class FileItemViewModel
+{
+
+    private bool isVisible = true;
+    /*private bool isHidden;
 		private bool isSelected;
 		private bool isExpanded;
 		private bool isEditing;*/
-		
-		/*private BitField16 flags = new BitField16 {
+
+    /*private BitField16 flags = new BitField16 {
 			//[0] = true,
 		};
 
@@ -52,281 +54,359 @@ namespace WinDirStat.Net.ViewModel.Files {
 		}
 #pragma warning restore 0649, IDE1006*/
 
-		//private bool canExpandRecursively = true;
-		//private bool lazyLoading;
-		//private bool? isChecked;
+    //private bool canExpandRecursively = true;
+    //private bool lazyLoading;
+    //private bool? isChecked;
 
-		private void UpdateIsVisible(bool parentIsVisible, bool updateFlattener) {
-			bool newIsVisible = parentIsVisible && !isHidden;
-			if (isVisible != newIsVisible) {
-				isVisible = newIsVisible;
+    private void UpdateIsVisible(bool parentIsVisible, bool updateFlattener)
+    {
+        bool newIsVisible = parentIsVisible && !isHidden;
+        if (isVisible != newIsVisible)
+        {
+            isVisible = newIsVisible;
 
-				// invalidate the augmented data
-				FileItemViewModel node = this;
-				while (node != null && node.totalListLength >= 0) {
-					node.totalListLength = -1;
-					node = node.listParent;
-				}
-				// Remember the removed nodes:
-				List<FileItemViewModel> removedNodes = null;
-				if (updateFlattener && !newIsVisible) {
-					removedNodes = VisibleDescendantsAndSelf().ToList();
-				}
-				// also update the model children:
-				UpdateChildIsVisible(false);
+            // invalidate the augmented data
+            FileItemViewModel node = this;
+            while (node != null && node.totalListLength >= 0)
+            {
+                node.totalListLength = -1;
+                node = node.listParent;
+            }
+            // Remember the removed nodes:
+            List<FileItemViewModel> removedNodes = null;
+            if (updateFlattener && !newIsVisible)
+            {
+                removedNodes = VisibleDescendantsAndSelf().ToList();
+            }
+            // also update the model children:
+            UpdateChildIsVisible(false);
 
-				// Validate our invariants:
-				if (updateFlattener)
-					CheckRootInvariants();
+            // Validate our invariants:
+            if (updateFlattener)
+            {
+                CheckRootInvariants();
+            }
 
-				// Tell the flattener about the removed nodes:
-				if (removedNodes != null) {
-					var flattener = GetListRoot().treeFlattener;
-					if (flattener != null) {
-						if (!SuppressRefresh)
-							flattener.NodesRemoved(GetVisibleIndexForNode(this), removedNodes);
-						foreach (var n in removedNodes)
-							n.OnIsVisibleChanged();
-					}
-				}
-				// Tell the flattener about the new nodes:
-				if (updateFlattener && newIsVisible) {
-					var flattener = GetListRoot().treeFlattener;
-					if (flattener != null) {
-						if (!SuppressRefresh)
-							flattener.NodesInserted(GetVisibleIndexForNode(this), VisibleDescendantsAndSelf());
-						foreach (var n in VisibleDescendantsAndSelf())
-							n.OnIsVisibleChanged();
-					}
-				}
-			}
-		}
+            // Tell the flattener about the removed nodes:
+            if (removedNodes != null)
+            {
+                var flattener = GetListRoot().treeFlattener;
+                if (flattener != null)
+                {
+                    if (!SuppressRefresh)
+                    {
+                        flattener.NodesRemoved(GetVisibleIndexForNode(this), removedNodes);
+                    }
 
-		protected void OnIsVisibleChanged() { }
+                    foreach (var n in removedNodes)
+                    {
+                        n.OnIsVisibleChanged();
+                    }
+                }
+            }
+            // Tell the flattener about the new nodes:
+            if (updateFlattener && newIsVisible)
+            {
+                var flattener = GetListRoot().treeFlattener;
+                if (flattener != null)
+                {
+                    if (!SuppressRefresh)
+                    {
+                        flattener.NodesInserted(GetVisibleIndexForNode(this), VisibleDescendantsAndSelf());
+                    }
 
-		private void UpdateChildIsVisible(bool updateFlattener) {
-			if (children != null && children.Count > 0) {
-				bool showChildren = isVisible && isExpanded;
-				foreach (FileItemViewModel child in children) {
-					child.UpdateIsVisible(showChildren, updateFlattener);
-				}
-			}
-		}
+                    foreach (var n in VisibleDescendantsAndSelf())
+                    {
+                        n.OnIsVisibleChanged();
+                    }
+                }
+            }
+        }
+    }
 
-		#region Main
-		
-		public IReadOnlyFileItemViewModelCollection Children {
-			get {
-				if (Model.IsContainerType) {
-					if (children == null)
-						children = new FileItemViewModelCollection(this);
-					return children;
-				}
-				return EmptyChildren;
-			}
-		}
+    protected void OnIsVisibleChanged() { }
 
-		public Brush Foreground  => SystemColors.WindowTextBrush;
-		
-		public int Level  => Parent != null ? Parent.Level + 1 : 0;
+    private void UpdateChildIsVisible(bool updateFlattener)
+    {
+        if (children != null && children.Count > 0)
+        {
+            bool showChildren = isVisible && isExpanded;
+            foreach (FileItemViewModel child in children)
+            {
+                child.UpdateIsVisible(showChildren, updateFlattener);
+            }
+        }
+    }
 
-		public bool IsRoot  => Parent == null;
+    #region Main
 
-		public bool IsHidden {
-			get => isHidden;
-			set {
-				if (isHidden != value) {
-					isHidden = value;
-					if (parent != null)
-						UpdateIsVisible(parent.isVisible && parent.isExpanded, true);
-					OnPropertyChanged();
-					if (Parent != null)
-						Parent.OnPropertyChanged(nameof(ShowExpander));
-				}
-			}
-		}
+    public IReadOnlyFileItemViewModelCollection Children
+    {
+        get
+        {
+            if (Model.IsContainerType)
+            {
+                if (children == null)
+                {
+                    children = new FileItemViewModelCollection(this);
+                }
 
-		/// <summary>
-		/// Return true when this node is not hidden and when all parent nodes are expanded and not hidden.
-		/// </summary>
-		public bool IsVisible => isVisible;
+                return children;
+            }
+            return EmptyChildren;
+        }
+    }
 
-		public bool IsSelected {
-			get => isSelected;
-			set {
-				if (isSelected != value) {
-					isSelected = value;
-					OnPropertyChanged();
-				}
-			}
-		}
+    public Brush Foreground => SystemColors.WindowTextBrush;
 
-		#endregion
-		
-		#region OnChildrenChanged
+    public int Level => Parent != null ? Parent.Level + 1 : 0;
 
-		internal protected void RaiseChildrenReset() {
-			Stopwatch watch = Stopwatch.StartNew();
-			GetListRoot().treeFlattener.NodesReset();
-			Debug.WriteLine($"Took {watch.ElapsedMilliseconds}ms to reset");
-		}
+    public bool IsRoot => Parent == null;
 
-		internal protected void OnChildrenReset(List<FileItemViewModel> newList, List<FileItemViewModel> oldList) {
-			foreach (FileItemViewModel node in oldList) {
-				Debug.Assert(node.parent == this);
+    public bool IsHidden
+    {
+        get => isHidden;
+        set
+        {
+            if (isHidden != value)
+            {
+                isHidden = value;
+                if (parent != null)
+                {
+                    UpdateIsVisible(parent.isVisible && parent.isExpanded, true);
+                }
 
-				//if (node.isHidden)
-				//	continue;
+                OnPropertyChanged();
+                if (Parent != null)
+                {
+                    Parent.OnPropertyChanged(nameof(ShowExpander));
+                }
+            }
+        }
+    }
 
-				node.Parent = null;
-				//Debug.WriteLine("Removing {0} from {1}", node, this);
-				FileItemViewModel removeEnd = node;
-				while (removeEnd.children != null && removeEnd.children.Count > 0)
-					removeEnd = removeEnd.children.Last();
+    /// <summary>
+    /// Return true when this node is not hidden and when all parent nodes are expanded and not hidden.
+    /// </summary>
+    public bool IsVisible => isVisible;
 
-				List<FileItemViewModel> removedNodes = null;
-				int visibleIndexOfRemoval = 0;
-				if (node.isVisible) {
-					visibleIndexOfRemoval = GetVisibleIndexForNode(node);
-					removedNodes = node.VisibleDescendantsAndSelf().ToList();
-				}
+    public bool IsSelected
+    {
+        get => isSelected;
+        set
+        {
+            if (isSelected != value)
+            {
+                isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
-				RemoveNodes(node, removeEnd);
-			}
+    #endregion
 
-			FileItemViewModel insertionPos = null;
+    #region OnChildrenChanged
 
-			foreach (FileItemViewModel node in newList) {
-				Debug.Assert(node.Model.Parent != null);
-				Debug.Assert(node.parent == null);
-				node.Parent = this;
-				node.UpdateIsVisible(isVisible && isExpanded, false);
-				//Debug.WriteLine("Inserting {0} after {1}", node, insertionPos);
+    internal protected void RaiseChildrenReset()
+    {
+        Stopwatch watch = Stopwatch.StartNew();
+        GetListRoot().treeFlattener.NodesReset();
+        Debug.WriteLine($"Took {watch.ElapsedMilliseconds}ms to reset");
+    }
 
-				while (insertionPos != null && insertionPos.children != null && insertionPos.children.Count > 0) {
-					insertionPos = insertionPos.children.Last();
-				}
-				InsertNodeAfter(insertionPos ?? this, node);
+    internal protected void OnChildrenReset(List<FileItemViewModel> newList, List<FileItemViewModel> oldList)
+    {
+        foreach (FileItemViewModel node in oldList)
+        {
+            Debug.Assert(node.parent == this);
 
-				insertionPos = node;
-			}
+            //if (node.isHidden)
+            //	continue;
 
-			if (!SuppressRefresh) {
-				var flattener = GetListRoot().treeFlattener;
-				if (flattener != null) {
-					flattener.NodesReset();
-				}
-			}
+            node.Parent = null;
+            //Debug.WriteLine("Removing {0} from {1}", node, this);
+            FileItemViewModel removeEnd = node;
+            while (removeEnd.children != null && removeEnd.children.Count > 0)
+            {
+                removeEnd = removeEnd.children.Last();
+            }
 
-			OnPropertyChanged(nameof(ShowExpander));
-			if (newList.Count > 0) {
-				if (oldList.Count > 0) {
-					if (newList[newList.Count - 1] != oldList[oldList.Count - 1]) {
-						oldList[oldList.Count - 1].OnPropertyChanged(nameof(IsLast));
-						newList[newList.Count - 1].OnPropertyChanged(nameof(IsLast));
-					}
-				}
-				else {
-					newList[newList.Count - 1].OnPropertyChanged(nameof(IsLast));
-				}
-			}
-			else if (oldList.Count > 0) {
-				oldList[oldList.Count - 1].OnPropertyChanged(nameof(IsLast));
-			}
-			//RaiseIsLastChangedIfNeeded(e);
-		}
-		internal protected void OnChildrenChanged(NotifyCollectionChangedEventArgs e) {
-			if (e.OldItems != null) {
-				foreach (FileItemViewModel node in e.OldItems) {
-					Debug.Assert(node.parent == this);
+            List<FileItemViewModel> removedNodes = null;
+            int visibleIndexOfRemoval = 0;
+            if (node.isVisible)
+            {
+                visibleIndexOfRemoval = GetVisibleIndexForNode(node);
+                removedNodes = node.VisibleDescendantsAndSelf().ToList();
+            }
 
-					//if (node.isHidden)
-					//	continue;
+            RemoveNodes(node, removeEnd);
+        }
 
-					node.Parent = null;
-					//Debug.WriteLine("Removing {0} from {1}", node, this);
-					FileItemViewModel removeEnd = node;
-					while (removeEnd.children != null && removeEnd.children.Count > 0)
-						removeEnd = removeEnd.children.Last();
+        FileItemViewModel insertionPos = null;
 
-					List<FileItemViewModel> removedNodes = null;
-					int visibleIndexOfRemoval = 0;
-					if (node.isVisible) {
-						visibleIndexOfRemoval = GetVisibleIndexForNode(node);
-						removedNodes = node.VisibleDescendantsAndSelf().ToList();
-					}
+        foreach (FileItemViewModel node in newList)
+        {
+            Debug.Assert(node.Model.Parent != null);
+            Debug.Assert(node.parent == null);
+            node.Parent = this;
+            node.UpdateIsVisible(isVisible && isExpanded, false);
+            //Debug.WriteLine("Inserting {0} after {1}", node, insertionPos);
 
-					RemoveNodes(node, removeEnd);
+            while (insertionPos != null && insertionPos.children != null && insertionPos.children.Count > 0)
+            {
+                insertionPos = insertionPos.children.Last();
+            }
+            InsertNodeAfter(insertionPos ?? this, node);
 
-					if (removedNodes != null && !SuppressRefresh) {
-						var flattener = GetListRoot().treeFlattener;
-						if (flattener != null) {
-							flattener.NodesRemoved(visibleIndexOfRemoval, removedNodes);
-						}
-					}
-				}
-			}
-			if (e.NewItems != null) {
-				FileItemViewModel insertionPos;
-				if (e.NewStartingIndex == 0)
-					insertionPos = null;
-				else
-					insertionPos = children[e.NewStartingIndex - 1];
+            insertionPos = node;
+        }
 
-				foreach (FileItemViewModel node in e.NewItems) {
-					Debug.Assert(node.Model.Parent != null);
-					Debug.Assert(node.parent == null);
-					node.Parent = this;
-					node.UpdateIsVisible(isVisible && isExpanded, false);
-					//Debug.WriteLine("Inserting {0} after {1}", node, insertionPos);
+        if (!SuppressRefresh)
+        {
+            var flattener = GetListRoot().treeFlattener;
+            if (flattener != null)
+            {
+                flattener.NodesReset();
+            }
+        }
 
-					while (insertionPos != null && insertionPos.children != null && insertionPos.children.Count > 0) {
-						insertionPos = insertionPos.children.Last();
-					}
-					InsertNodeAfter(insertionPos ?? this, node);
+        OnPropertyChanged(nameof(ShowExpander));
+        if (newList.Count > 0)
+        {
+            if (oldList.Count > 0)
+            {
+                if (newList[newList.Count - 1] != oldList[oldList.Count - 1])
+                {
+                    oldList[oldList.Count - 1].OnPropertyChanged(nameof(IsLast));
+                    newList[newList.Count - 1].OnPropertyChanged(nameof(IsLast));
+                }
+            }
+            else
+            {
+                newList[newList.Count - 1].OnPropertyChanged(nameof(IsLast));
+            }
+        }
+        else if (oldList.Count > 0)
+        {
+            oldList[oldList.Count - 1].OnPropertyChanged(nameof(IsLast));
+        }
+        //RaiseIsLastChangedIfNeeded(e);
+    }
+    internal protected void OnChildrenChanged(NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (FileItemViewModel node in e.OldItems)
+            {
+                Debug.Assert(node.parent == this);
 
-					insertionPos = node;
-					if (node.isVisible && !SuppressRefresh) {
-						var flattener = GetListRoot().treeFlattener;
-						if (flattener != null) {
-							flattener.NodesInserted(GetVisibleIndexForNode(node), node.VisibleDescendantsAndSelf());
-						}
-					}
-				}
-			}
+                //if (node.isHidden)
+                //	continue;
 
-			OnPropertyChanged(nameof(ShowExpander));
-			RaiseIsLastChangedIfNeeded(e);
-		}
-		#endregion
+                node.Parent = null;
+                //Debug.WriteLine("Removing {0} from {1}", node, this);
+                FileItemViewModel removeEnd = node;
+                while (removeEnd.children != null && removeEnd.children.Count > 0)
+                {
+                    removeEnd = removeEnd.children.Last();
+                }
 
-		#region Expanding / LazyLoading
-		
-		public bool ShowExpander {
-			get => Model.HasChildren;
-		}
+                List<FileItemViewModel> removedNodes = null;
+                int visibleIndexOfRemoval = 0;
+                if (node.isVisible)
+                {
+                    visibleIndexOfRemoval = GetVisibleIndexForNode(node);
+                    removedNodes = node.VisibleDescendantsAndSelf().ToList();
+                }
 
-		public bool IsExpanded {
-			get => isExpanded;
-			set {
-				if (isExpanded != value) {
-					isExpanded = value;
-					if (isExpanded) {
-						OnExpanding();
-					}
-					else {
-						OnCollapsing();
-					}
-					UpdateChildIsVisible(true);
-					OnPropertyChanged();
-				}
-			}
-		}
+                RemoveNodes(node, removeEnd);
 
-		//protected virtual void OnExpanding() { }
-		//protected virtual void OnCollapsing() { }
+                if (removedNodes != null && !SuppressRefresh)
+                {
+                    var flattener = GetListRoot().treeFlattener;
+                    if (flattener != null)
+                    {
+                        flattener.NodesRemoved(visibleIndexOfRemoval, removedNodes);
+                    }
+                }
+            }
+        }
+        if (e.NewItems != null)
+        {
+            FileItemViewModel insertionPos;
+            if (e.NewStartingIndex == 0)
+            {
+                insertionPos = null;
+            }
+            else
+            {
+                insertionPos = children[e.NewStartingIndex - 1];
+            }
 
-		/*public bool LazyLoading {
+            foreach (FileItemViewModel node in e.NewItems)
+            {
+                Debug.Assert(node.Model.Parent != null);
+                Debug.Assert(node.parent == null);
+                node.Parent = this;
+                node.UpdateIsVisible(isVisible && isExpanded, false);
+                //Debug.WriteLine("Inserting {0} after {1}", node, insertionPos);
+
+                while (insertionPos != null && insertionPos.children != null && insertionPos.children.Count > 0)
+                {
+                    insertionPos = insertionPos.children.Last();
+                }
+                InsertNodeAfter(insertionPos ?? this, node);
+
+                insertionPos = node;
+                if (node.isVisible && !SuppressRefresh)
+                {
+                    var flattener = GetListRoot().treeFlattener;
+                    if (flattener != null)
+                    {
+                        flattener.NodesInserted(GetVisibleIndexForNode(node), node.VisibleDescendantsAndSelf());
+                    }
+                }
+            }
+        }
+
+        OnPropertyChanged(nameof(ShowExpander));
+        RaiseIsLastChangedIfNeeded(e);
+    }
+    #endregion
+
+    #region Expanding / LazyLoading
+
+    public bool ShowExpander
+    {
+        get => Model.HasChildren;
+    }
+
+    public bool IsExpanded
+    {
+        get => isExpanded;
+        set
+        {
+            if (isExpanded != value)
+            {
+                isExpanded = value;
+                if (isExpanded)
+                {
+                    OnExpanding();
+                }
+                else
+                {
+                    OnCollapsing();
+                }
+                UpdateChildIsVisible(true);
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    //protected virtual void OnExpanding() { }
+    //protected virtual void OnCollapsing() { }
+
+    /*public bool LazyLoading {
 			get => lazyLoading;
 			set {
 				lazyLoading = value;
@@ -342,15 +422,16 @@ namespace WinDirStat.Net.ViewModel.Files {
 			}
 		}*/
 
-		/// <summary>
-		/// Gets whether this node can be expanded recursively.
-		/// If not overridden, this property returns false if the node is using lazy-loading, and true otherwise.
-		/// </summary>
-		public bool CanExpandRecursively {
-			get => false;// ItemCount <= 500;
-		}
+    /// <summary>
+    /// Gets whether this node can be expanded recursively.
+    /// If not overridden, this property returns false if the node is using lazy-loading, and true otherwise.
+    /// </summary>
+    public bool CanExpandRecursively
+    {
+        get => false;// ItemCount <= 500;
+    }
 
-		/*public bool ShowIcon {
+    /*public bool ShowIcon {
 			get { return Icon != null; }
 		}
 
@@ -368,71 +449,88 @@ namespace WinDirStat.Net.ViewModel.Files {
 			}
 		}*/
 
-		#endregion
+    #endregion
 
-		#region Ancestors / Descendants
+    #region Ancestors / Descendants
 
-		public IEnumerable<FileItemViewModel> Descendants() {
-			return FileTreeTraversal.PreOrder(this.Children, n => n.Children);
-		}
+    public IEnumerable<FileItemViewModel> Descendants()
+    {
+        return FileTreeTraversal.PreOrder(this.Children, n => n.Children);
+    }
 
-		public IEnumerable<FileItemViewModel> VirtualDescendants() {
-			return FileTreeTraversal.PreOrder(this.Children, n => n.Children);
-		}
+    public IEnumerable<FileItemViewModel> VirtualDescendants()
+    {
+        return FileTreeTraversal.PreOrder(this.Children, n => n.Children);
+    }
 
-		public IEnumerable<FileItemViewModel> DescendantsAndSelf() {
-			return FileTreeTraversal.PreOrder(this, n => n.Children);
-		}
+    public IEnumerable<FileItemViewModel> DescendantsAndSelf()
+    {
+        return FileTreeTraversal.PreOrder(this, n => n.Children);
+    }
 
-		public IEnumerable<FileItemViewModel> VisibleDescendants() {
-			return FileTreeTraversal.PreOrder(this.Children.Where(c => c.isVisible), n => n.Children.Where(c => c.isVisible));
-		}
+    public IEnumerable<FileItemViewModel> VisibleDescendants()
+    {
+        return FileTreeTraversal.PreOrder(this.Children.Where(c => c.isVisible), n => n.Children.Where(c => c.isVisible));
+    }
 
-		public IEnumerable<FileItemViewModel> VisibleDescendantsAndSelf() {
-			return FileTreeTraversal.PreOrder(this, n => n.Children.Where(c => c.isVisible));
-		}
+    public IEnumerable<FileItemViewModel> VisibleDescendantsAndSelf()
+    {
+        return FileTreeTraversal.PreOrder(this, n => n.Children.Where(c => c.isVisible));
+    }
 
-		public IEnumerable<FileItemViewModel> Ancestors() {
-			for (FileItemViewModel n = this.Parent; n != null; n = n.Parent)
-				yield return n;
-		}
+    public IEnumerable<FileItemViewModel> Ancestors()
+    {
+        for (FileItemViewModel n = this.Parent; n != null; n = n.Parent)
+        {
+            yield return n;
+        }
+    }
 
-		public IEnumerable<FileItemViewModel> AncestorsAndSelf() {
-			for (FileItemViewModel n = this; n != null; n = n.Parent)
-				yield return n;
-		}
+    public IEnumerable<FileItemViewModel> AncestorsAndSelf()
+    {
+        for (FileItemViewModel n = this; n != null; n = n.Parent)
+        {
+            yield return n;
+        }
+    }
 
-		#endregion
+    #endregion
 
-		#region Editing
+    #region Editing
 
-		public bool IsEditable {
-			get => false;
-		}
+    public bool IsEditable
+    {
+        get => false;
+    }
 
-		public bool IsEditing {
-			get => isEditing;
-			set { 
-				if (isEditing != value) {
-					isEditing = value;
-					OnPropertyChanged();
-				}
-			}
-		}
+    public bool IsEditing
+    {
+        get => isEditing;
+        set
+        {
+            if (isEditing != value)
+            {
+                isEditing = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
-		public string LoadEditText() {
-			return null;
-		}
+    public string LoadEditText()
+    {
+        return null;
+    }
 
-		public bool SaveEditText(string value) {
-			return true;
-		}
+    public bool SaveEditText(string value)
+    {
+        return true;
+    }
 
-		#endregion
+    #endregion
 
-		#region Checkboxes (Disabled)
+    #region Checkboxes (Disabled)
 
-		/*public bool IsCheckable {
+    /*public bool IsCheckable {
 			get => false;
 		}
 
@@ -479,17 +577,17 @@ namespace WinDirStat.Net.ViewModel.Files {
 			return false;
 		}*/
 
-		#endregion
+    #endregion
 
-		#region Cut / Copy / Paste / Delete (Disabled)
+    #region Cut / Copy / Paste / Delete (Disabled)
 
-		/// <summary>
-		/// Gets whether the node should render transparently because it is 'cut' (but not actually removed yet).
-		/// </summary>
-		/*public bool IsCut {
+    /// <summary>
+    /// Gets whether the node should render transparently because it is 'cut' (but not actually removed yet).
+    /// </summary>
+    /*public bool IsCut {
 			get => false;
 		}*/
-		/*
+    /*
 			static List<WinDirNode> cuttedNodes = new List<WinDirNode>();
 			static IDataObject cuttedData;
 			static EventHandler requerySuggestedHandler; // for weak event
@@ -585,7 +683,7 @@ namespace WinDirStat.Net.ViewModel.Files {
 			}
 		 */
 
-		/*public bool CanDelete(WinDirNode[] nodes) {
+    /*public bool CanDelete(WinDirNode[] nodes) {
 			return false;
 		}
 
@@ -631,10 +729,10 @@ namespace WinDirStat.Net.ViewModel.Files {
 		public void Paste(IDataObject data) {
 			throw new NotSupportedException(GetType().Name + " does not support copy/paste");
 		}*/
-		#endregion
+    #endregion
 
-		#region Drag and Drop (Disabled)
-		/*public void StartDrag(DependencyObject dragSource, WinDirNode[] nodes) {
+    #region Drag and Drop (Disabled)
+    /*public void StartDrag(DependencyObject dragSource, WinDirNode[] nodes) {
 			// The default drag implementation works by reusing the copy infrastructure.
 			// Derived classes should override this method
 			var data = GetDataObject(nodes);
@@ -682,45 +780,52 @@ namespace WinDirStat.Net.ViewModel.Files {
 			// we'll use Paste() in our default drop implementation.
 			Paste(e.Data);
 		}*/
-		#endregion
+    #endregion
 
-		#region IsLast (for TreeView lines)
+    #region IsLast (for TreeView lines)
 
-		public bool IsLast {
-			get => Parent == null || Parent.Children[Parent.Children.Count - 1] == this;
-		}
+    public bool IsLast
+    {
+        get => Parent == null || Parent.Children[Parent.Children.Count - 1] == this;
+    }
 
-		void RaiseIsLastChangedIfNeeded(NotifyCollectionChangedEventArgs e) {
-			switch (e.Action) {
-			case NotifyCollectionChangedAction.Add:
-				if (e.NewStartingIndex == Children.Count - 1) {
-					if (Children.Count > 1) {
-						Children[Children.Count - 2].OnPropertyChanged("IsLast");
-					}
-					Children[Children.Count - 1].OnPropertyChanged("IsLast");
-				}
-				break;
-			case NotifyCollectionChangedAction.Remove:
-				if (e.OldStartingIndex == Children.Count) {
-					if (Children.Count > 0) {
-						Children[Children.Count - 1].OnPropertyChanged("IsLast");
-					}
-				}
-				break;
-			}
-		}
+    void RaiseIsLastChangedIfNeeded(NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (e.NewStartingIndex == Children.Count - 1)
+                {
+                    if (Children.Count > 1)
+                    {
+                        Children[Children.Count - 2].OnPropertyChanged("IsLast");
+                    }
+                    Children[Children.Count - 1].OnPropertyChanged("IsLast");
+                }
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                if (e.OldStartingIndex == Children.Count)
+                {
+                    if (Children.Count > 0)
+                    {
+                        Children[Children.Count - 1].OnPropertyChanged("IsLast");
+                    }
+                }
+                break;
+        }
+    }
 
-		#endregion
+    #endregion
 
-		#region INotifyPropertyChanged Members (Disabled)
+    #region INotifyPropertyChanged Members (Disabled)
 
-		/*public event PropertyChangedEventHandler PropertyChanged {
+    /*public event PropertyChangedEventHandler PropertyChanged {
 			add { }
 			remove { }
 			//add => PropertyChanged += value;
 			//remove => PropertyChanged -= value;
 		}*/
-		/*public event PropertyChangedEventHandler PropertyChanged;
+    /*public event PropertyChangedEventHandler PropertyChanged;
 
 		protected internal void OnPropertyChanged(string name) {
 			//visualInfo?.OnPropertyChanged(this, new PropertyChangedEventArgs(name));
@@ -737,40 +842,42 @@ namespace WinDirStat.Net.ViewModel.Files {
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}*/
 
-		#endregion
+    #endregion
 
-		#region Model (Disabled)
-		/// <summary>
-		/// Gets the underlying model object.
-		/// </summary>
-		/// <remarks>
-		/// This property calls the virtual <see cref="GetModel()"/> helper method.
-		/// I didn't make the property itself virtual because deriving classes
-		/// may wish to replace it with a more specific return type,
-		/// but C# doesn't support variance in override declarations.
-		/// </remarks>
-		/*public object Model {
+    #region Model (Disabled)
+    /// <summary>
+    /// Gets the underlying model object.
+    /// </summary>
+    /// <remarks>
+    /// This property calls the virtual <see cref="GetModel()"/> helper method.
+    /// I didn't make the property itself virtual because deriving classes
+    /// may wish to replace it with a more specific return type,
+    /// but C# doesn't support variance in override declarations.
+    /// </remarks>
+    /*public object Model {
 			get => GetModel();
 		}
 
 		protected virtual object GetModel() {
 			return null;
 		}*/
-		#endregion
+    #endregion
 
-		/// <summary>
-		/// Gets called when the item is double-clicked.
-		/// </summary>
-		public void ActivateItem() {
-		}
+    /// <summary>
+    /// Gets called when the item is double-clicked.
+    /// </summary>
+    public void ActivateItem()
+    {
+    }
 
-		public void ShowContextMenu(ContextMenuEventArgs e) {
-			
-		}
+    public void ShowContextMenu(ContextMenuEventArgs e)
+    {
 
-		public override string ToString() {
-			// used for keyboard navigation
-			return Name ?? string.Empty;
-		}
-	}
+    }
+
+    public override string ToString()
+    {
+        // used for keyboard navigation
+        return Name ?? string.Empty;
+    }
 }

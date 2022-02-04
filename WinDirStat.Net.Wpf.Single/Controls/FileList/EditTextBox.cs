@@ -26,66 +26,79 @@ using System.Windows.Data;
 using System.Windows;
 using WinDirStat.Net.ViewModel.Files;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	class EditTextBox : TextBox {
-		static EditTextBox() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(EditTextBox),
-				new FrameworkPropertyMetadata(typeof(EditTextBox)));
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-		public EditTextBox() {
-			Loaded += delegate { Init(); };
-		}
+class EditTextBox : TextBox
+{
+    static EditTextBox()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(EditTextBox),
+            new FrameworkPropertyMetadata(typeof(EditTextBox)));
+    }
 
-		public FileTreeViewItem Item { get; set; }
+    public EditTextBox()
+    {
+        Loaded += delegate { Init(); };
+    }
 
-		public FileItemViewModel Node {
-			get { return Item.Node; }
-		}
+    public FileTreeViewItem Item { get; set; }
 
-		void Init() {
-			Text = Node.LoadEditText();
-			Focus();
-			SelectAll();
-		}
+    public FileItemViewModel Node
+    {
+        get { return Item.Node; }
+    }
 
-		protected override void OnKeyDown(KeyEventArgs e) {
-			if (e.Key == Key.Enter) {
-				Commit();
-			}
-			else if (e.Key == Key.Escape) {
-				Node.IsEditing = false;
-			}
-		}
+    void Init()
+    {
+        Text = Node.LoadEditText();
+        Focus();
+        SelectAll();
+    }
 
-		protected override void OnLostKeyboardFocus(KeyboardFocusChangedEventArgs e) {
-			if (Node.IsEditing) {
-				Commit();
-			}
-		}
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            Commit();
+        }
+        else if (e.Key == Key.Escape)
+        {
+            Node.IsEditing = false;
+        }
+    }
 
-		bool commiting;
+    protected override void OnLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
+    {
+        if (Node.IsEditing)
+        {
+            Commit();
+        }
+    }
 
-		void Commit() {
-			if (!commiting) {
-				commiting = true;
+    bool commiting;
 
-				Node.IsEditing = false;
-				if (!Node.SaveEditText(Text)) {
-					Item.Focus();
-				}
-				//Node.RaisePropertyChanged("Text");
+    void Commit()
+    {
+        if (!commiting)
+        {
+            commiting = true;
 
-				//if (Node.SaveEditText(Text)) {
-				//    Node.IsEditing = false;
-				//    Node.RaisePropertyChanged("Text");
-				//}
-				//else {
-				//    Init();
-				//}
+            Node.IsEditing = false;
+            if (!Node.SaveEditText(Text))
+            {
+                Item.Focus();
+            }
+            //Node.RaisePropertyChanged("Text");
 
-				commiting = false;
-			}
-		}
-	}
+            //if (Node.SaveEditText(Text)) {
+            //    Node.IsEditing = false;
+            //    Node.RaisePropertyChanged("Text");
+            //}
+            //else {
+            //    Init();
+            //}
+
+            commiting = false;
+        }
+    }
 }

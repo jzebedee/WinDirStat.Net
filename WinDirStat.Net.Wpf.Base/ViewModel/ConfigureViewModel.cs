@@ -5,43 +5,44 @@ using System.Text;
 using System.Threading.Tasks;
 using WinDirStat.Net.Services;
 
-namespace WinDirStat.Net.ViewModel {
-	/// <summary>The view model for the configure dialog.</summary>
-	public partial class ConfigureViewModel : ViewModelWindow {
+namespace WinDirStat.Net.ViewModel;
 
-		#region Fields
+/// <summary>The view model for the configure dialog.</summary>
+public partial class ConfigureViewModel : ViewModelWindow
+{
 
-		// Services
-		/// <summary>Gets the program settings service.</summary>
-		public SettingsService Settings { get; }
-		/// <summary>Gets the UI service.</summary>
-		public UIService UI { get; }
-		/// <summary>Gets the dialog service.</summary>
-		public IMyDialogService Dialogs { get; }
+    #region Fields
 
-		#endregion
+    // Services
+    /// <summary>Gets the program settings service.</summary>
+    public SettingsService Settings { get; }
+    /// <summary>Gets the UI service.</summary>
+    public UIService UI { get; }
+    /// <summary>Gets the dialog service.</summary>
+    public IMyDialogService Dialogs { get; }
 
-		#region Constructors
+    #endregion
 
-		/// <summary>Constructrs the <see cref="DriveSelectViewModel"/>.</summary>
-		public ConfigureViewModel(SettingsService settings,
-								  UIService ui,
-								  IMyDialogService dialog,
-								  RelayCommandFactory relayFactory)
-			: base(relayFactory)
-		{
-			Settings = settings;
-			UI = ui;
-			Dialogs = dialog;
-		}
+    #region Constructors
 
-		#endregion
+    /// <summary>Constructrs the <see cref="DriveSelectViewModel"/>.</summary>
+    public ConfigureViewModel(SettingsService settings,
+                              UIService ui,
+                              IMyDialogService dialog,
+                              RelayCommandFactory relayFactory)
+        : base(relayFactory)
+    {
+        Settings = settings;
+        UI = ui;
+        Dialogs = dialog;
+    }
 
-		#region Override Properties
+    #endregion
 
-		/// <summary>Gets the title to display for the window.</summary>
-		public override string Title => "WinDirStat.Net - Settings";
+    #region Override Properties
 
-		#endregion
-	}
+    /// <summary>Gets the title to display for the window.</summary>
+    public override string Title => "WinDirStat.Net - Settings";
+
+    #endregion
 }

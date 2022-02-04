@@ -1,38 +1,40 @@
 ﻿using System.Windows;
 using WinDirStat.Net.Services;
 
-namespace WinDirStat.Net.ViewModel {
-    /// <summary>An addition to the <see cref="ViewModelBase"/> class with extra helper functions.</summary>
-    public abstract class ViewModelWindow : ViewModelRelayCommand {
+namespace WinDirStat.Net.ViewModel;
 
-		#region Fields
+/// <summary>An addition to the <see cref="ViewModelBase"/> class with extra helper functions.</summary>
+public abstract class ViewModelWindow : ViewModelRelayCommand
+{
 
-		/// <summary>The window owning this view model.</summary>
-		private Window windowOwner;
+    #region Fields
 
-		#endregion
+    /// <summary>The window owning this view model.</summary>
+    private Window windowOwner;
 
-		#region Constructors
+    #endregion
 
-		public ViewModelWindow(RelayCommandFactory relayFactory) : base(relayFactory) { }
+    #region Constructors
 
-		#endregion
+    public ViewModelWindow(RelayCommandFactory relayFactory) : base(relayFactory) { }
 
-		#region Abstract Properties
+    #endregion
 
-		/// <summary>Gets the title to display for the window.</summary>
-		public virtual string Title => "WinDirStat.Net";
+    #region Abstract Properties
 
-		#endregion
+    /// <summary>Gets the title to display for the window.</summary>
+    public virtual string Title => "WinDirStat.Net";
 
-		#region Properties
+    #endregion
 
-		/// <summary>Gets or sets the window owning this view model.</summary>
-		public Window WindowOwner {
-			get => windowOwner;
-			set => SetProperty(ref windowOwner, value);
-		}
-		
-		#endregion
-	}
+    #region Properties
+
+    /// <summary>Gets or sets the window owning this view model.</summary>
+    public Window WindowOwner
+    {
+        get => windowOwner;
+        set => SetProperty(ref windowOwner, value);
+    }
+
+    #endregion
 }

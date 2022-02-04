@@ -10,64 +10,74 @@ using System.Windows.Media;
 using WinDirStat.Net.Utils;
 using WinDirStat.Net.Wpf.Utils;
 
-namespace WinDirStat.Net.Wpf.Controls {
-	/// <summary>A menu item with easy access for setting its icon.</summary>
-	public class ImageMenuItem : MenuItem {
+namespace WinDirStat.Net.Wpf.Controls;
 
-		/// <summary>The dependency property for the menu item's image.</summary>
-		public static readonly DependencyProperty SourceProperty =
-			DependencyProperty.RegisterAttached("Source", typeof(ImageSource), typeof(ImageMenuItem),
-				new FrameworkPropertyMetadata(OnSourceChanged));
+/// <summary>A menu item with easy access for setting its icon.</summary>
+public class ImageMenuItem : MenuItem
+{
 
-		/// <summary>Gets or sets the source of the menu item's image.</summary>
-		[Category("Common")]
-		public ImageSource Source {
-			get => (ImageSource) GetValue(SourceProperty);
-			set => SetValue(SourceProperty, value);
-		}
+    /// <summary>The dependency property for the menu item's image.</summary>
+    public static readonly DependencyProperty SourceProperty =
+        DependencyProperty.RegisterAttached("Source", typeof(ImageSource), typeof(ImageMenuItem),
+            new FrameworkPropertyMetadata(OnSourceChanged));
 
-		/// <summary>Called when the source property for the menu item is changed.</summary>
-		private static void OnSourceChanged(object sender, DependencyPropertyChangedEventArgs e) {
-			ImageMenuItem menuItem = (ImageMenuItem) sender;
-			menuItem.image.Source = menuItem.Source;
-		}
+    /// <summary>Gets or sets the source of the menu item's image.</summary>
+    [Category("Common")]
+    public ImageSource Source
+    {
+        get => (ImageSource)GetValue(SourceProperty);
+        set => SetValue(SourceProperty, value);
+    }
 
-		private static object CoerceIcon(DependencyObject d, object value) {
-			ImageMenuItem menuItem = (ImageMenuItem) d;
+    /// <summary>Called when the source property for the menu item is changed.</summary>
+    private static void OnSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        ImageMenuItem menuItem = (ImageMenuItem)sender;
+        menuItem.image.Source = menuItem.Source;
+    }
 
-			if (menuItem.IsValueUnsetAndNull(IconProperty, value)) {
-				return menuItem.image;
-			}
-			return value;
-		}
+    private static object CoerceIcon(DependencyObject d, object value)
+    {
+        ImageMenuItem menuItem = (ImageMenuItem)d;
 
-		/// <summary>The image that contains the menu item's icon.</summary>
-		private Image image;
+        if (menuItem.IsValueUnsetAndNull(IconProperty, value))
+        {
+            return menuItem.image;
+        }
+        return value;
+    }
 
-		/// <summary>Initializes the image menu item default style.</summary>
-		static ImageMenuItem() {
-			//DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageMenuItem),
-			//		   new FrameworkPropertyMetadata(typeof(ImageMenuItem)));
-			IconProperty.OverrideMetadata(typeof(ImageMenuItem),
-				new FrameworkPropertyMetadata(null, CoerceIcon));
-		}
+    /// <summary>The image that contains the menu item's icon.</summary>
+    private Image image;
 
-		/// <summary>Constructs an empty menu item.</summary>
-		public ImageMenuItem() {
-			image = new Image() {
-				Stretch = Stretch.None,
-			};
-			Icon = image;
-		}
+    /// <summary>Initializes the image menu item default style.</summary>
+    static ImageMenuItem()
+    {
+        //DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageMenuItem),
+        //		   new FrameworkPropertyMetadata(typeof(ImageMenuItem)));
+        IconProperty.OverrideMetadata(typeof(ImageMenuItem),
+            new FrameworkPropertyMetadata(null, CoerceIcon));
+    }
 
-		/// <summary>Constructs an menu item with an image and name.</summary>
-		public ImageMenuItem(ImageSource source, string header) {
-			image = new Image() {
-				Stretch = Stretch.None,
-				Source = source,
-			};
-			Icon = image;
-			Header = header;
-		}
-	}
+    /// <summary>Constructs an empty menu item.</summary>
+    public ImageMenuItem()
+    {
+        image = new Image()
+        {
+            Stretch = Stretch.None,
+        };
+        Icon = image;
+    }
+
+    /// <summary>Constructs an menu item with an image and name.</summary>
+    public ImageMenuItem(ImageSource source, string header)
+    {
+        image = new Image()
+        {
+            Stretch = Stretch.None,
+            Source = source,
+        };
+        Icon = image;
+        Header = header;
+    }
 }

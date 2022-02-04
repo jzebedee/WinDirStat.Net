@@ -6,80 +6,89 @@ using System.Text;
 using System.Threading.Tasks;
 using WinDirStat.Net.ViewModel.Extensions;
 
-namespace WinDirStat.Net.ViewModel.Comparers {
-	/// <summary>The sort mode for use in the file types list.</summary>
-	[Serializable]
-	public enum ExtensionSortMode {
-		None,
-		Extension,
-		Color,
-		Description,
-		Bytes,
-		Percent,
-		Files,
-		[Browsable(false)]
-		Count,
-	}
+namespace WinDirStat.Net.ViewModel.Comparers;
 
-	/// <summary>The comparer for <see cref="ExtensionItemViewModel"/>s.</summary>
-	public class ExtensionComparer : SortComparer<ExtensionItemViewModel, ExtensionSortMode> {
+/// <summary>The sort mode for use in the file types list.</summary>
+[Serializable]
+public enum ExtensionSortMode
+{
+    None,
+    Extension,
+    Color,
+    Description,
+    Bytes,
+    Percent,
+    Files,
+    [Browsable(false)]
+    Count,
+}
 
-		#region Constructors
+/// <summary>The comparer for <see cref="ExtensionItemViewModel"/>s.</summary>
+public class ExtensionComparer : SortComparer<ExtensionItemViewModel, ExtensionSortMode>
+{
 
-		/// <summary>Constructs the default <see cref="ExtensionComparer"/>.</summary>
-		public ExtensionComparer()
-			: base(ExtensionSortMode.Bytes, ListSortDirection.Descending)
-		{
-		}
+    #region Constructors
 
-		#endregion
+    /// <summary>Constructs the default <see cref="ExtensionComparer"/>.</summary>
+    public ExtensionComparer()
+        : base(ExtensionSortMode.Bytes, ListSortDirection.Descending)
+    {
+    }
 
-		#region SortComparer Overrides
+    #endregion
 
-		/// <summary>A secondary comparison that's called when the sort mode comparison returns 0.</summary>
-		/// 
-		/// <param name="a">The first item to compare.</param>
-		/// <param name="b">The second item to compare.</param>
-		/// <returns>The comparison result.</returns>
-		protected override Comparison<ExtensionItemViewModel> GetSortComparison(ExtensionSortMode mode) {
-			switch (mode) {
-			case ExtensionSortMode.None:
-			case ExtensionSortMode.Bytes:
-			case ExtensionSortMode.Percent:
-			case ExtensionSortMode.Color: return SortBySize;
-			case ExtensionSortMode.Extension: return SortByExtension;
-			case ExtensionSortMode.Description: return SortByDescription;
-			case ExtensionSortMode.Files: return SortByFiles;
-			default:
-				throw new ArgumentException($"Invalid {typeof(ExtensionSortMode).Name} ({mode})!", nameof(mode));
-			}
-		}
+    #region SortComparer Overrides
 
-		/// <summary>Gets the comparison method for the specified sort mode.</summary>
-		/// 
-		/// <param name="mode">The mode to get the comparison of.</param>
-		/// <returns>The comparison to use.</returns>
-		protected override int SecondaryCompare(ExtensionItemViewModel a, ExtensionItemViewModel b) {
-			return string.Compare(a.Model.Extension, b.Model.Extension, true);
-		}
+    /// <summary>A secondary comparison that's called when the sort mode comparison returns 0.</summary>
+    /// 
+    /// <param name="a">The first item to compare.</param>
+    /// <param name="b">The second item to compare.</param>
+    /// <returns>The comparison result.</returns>
+    protected override Comparison<ExtensionItemViewModel> GetSortComparison(ExtensionSortMode mode)
+    {
+        switch (mode)
+        {
+            case ExtensionSortMode.None:
+            case ExtensionSortMode.Bytes:
+            case ExtensionSortMode.Percent:
+            case ExtensionSortMode.Color: return SortBySize;
+            case ExtensionSortMode.Extension: return SortByExtension;
+            case ExtensionSortMode.Description: return SortByDescription;
+            case ExtensionSortMode.Files: return SortByFiles;
+            default:
+                throw new ArgumentException($"Invalid {typeof(ExtensionSortMode).Name} ({mode})!", nameof(mode));
+        }
+    }
 
-		#endregion
+    /// <summary>Gets the comparison method for the specified sort mode.</summary>
+    /// 
+    /// <param name="mode">The mode to get the comparison of.</param>
+    /// <returns>The comparison to use.</returns>
+    protected override int SecondaryCompare(ExtensionItemViewModel a, ExtensionItemViewModel b)
+    {
+        return string.Compare(a.Model.Extension, b.Model.Extension, true);
+    }
 
-		#region Comparisons
+    #endregion
 
-		private static int SortByExtension(ExtensionItemViewModel a, ExtensionItemViewModel b) {
-			return string.Compare(a.Model.Extension, b.Model.Extension, true);
-		}
-		private static int SortByDescription(ExtensionItemViewModel a, ExtensionItemViewModel b) {
-			return string.Compare(a.TypeName, b.TypeName, true);
-		}
-		private static int SortBySize(ExtensionItemViewModel a, ExtensionItemViewModel b) {
-			return a.Model.Size.CompareTo(b.Model.Size);
-		}
-		private static int SortByFiles(ExtensionItemViewModel a, ExtensionItemViewModel b) {
-			return a.Model.FileCount - b.Model.FileCount;
-		}
+    #region Comparisons
 
-		#endregion
-	}
+    private static int SortByExtension(ExtensionItemViewModel a, ExtensionItemViewModel b)
+    {
+        return string.Compare(a.Model.Extension, b.Model.Extension, true);
+    }
+    private static int SortByDescription(ExtensionItemViewModel a, ExtensionItemViewModel b)
+    {
+        return string.Compare(a.TypeName, b.TypeName, true);
+    }
+    private static int SortBySize(ExtensionItemViewModel a, ExtensionItemViewModel b)
+    {
+        return a.Model.Size.CompareTo(b.Model.Size);
+    }
+    private static int SortByFiles(ExtensionItemViewModel a, ExtensionItemViewModel b)
+    {
+        return a.Model.FileCount - b.Model.FileCount;
+    }
+
+    #endregion
 }

@@ -7,28 +7,39 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace WinDirStat.Net.Wpf.Converters {
-	public class RadioButtonConverter : MarkupExtension, IValueConverter {
-		public static readonly RadioButtonConverter Instance = new RadioButtonConverter();
+namespace WinDirStat.Net.Wpf.Converters;
 
-		public override object ProvideValue(IServiceProvider serviceProvider) {
-			return Instance;
-		}
+public class RadioButtonConverter : MarkupExtension, IValueConverter
+{
+    public static readonly RadioButtonConverter Instance = new RadioButtonConverter();
 
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-			return (parameter?.ToString() == value?.ToString());
-		}
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        return Instance;
+    }
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-			if ((bool) value) {
-				if (targetType == typeof(string))
-					return parameter.ToString();
-				else if (targetType.IsEnum)
-					return Enum.Parse(targetType, parameter.ToString());
-				else
-					return System.Convert.ChangeType(parameter, targetType);
-			}
-			return Binding.DoNothing;
-		}
-	}
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return (parameter?.ToString() == value?.ToString());
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if ((bool)value)
+        {
+            if (targetType == typeof(string))
+            {
+                return parameter.ToString();
+            }
+            else if (targetType.IsEnum)
+            {
+                return Enum.Parse(targetType, parameter.ToString());
+            }
+            else
+            {
+                return System.Convert.ChangeType(parameter, targetType);
+            }
+        }
+        return Binding.DoNothing;
+    }
 }

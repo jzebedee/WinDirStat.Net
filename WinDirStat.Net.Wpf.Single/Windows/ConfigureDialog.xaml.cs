@@ -13,36 +13,41 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WinDirStat.Net.Wpf.Utils;
 
-namespace WinDirStat.Net.Wpf.Windows {
-	/// <summary>
-	/// Interaction logic for ConfigureDialog.xaml
-	/// </summary>
-	public partial class ConfigureDialog : Window {
-		public ConfigureDialog() {
-			InitializeComponent();
-		}
+namespace WinDirStat.Net.Wpf.Windows;
 
-		#region Properties
+/// <summary>
+/// Interaction logic for ConfigureDialog.xaml
+/// </summary>
+public partial class ConfigureDialog : Window
+{
+    public ConfigureDialog()
+    {
+        InitializeComponent();
+    }
 
-		/// <summary>Gets the <see cref="ConfigureViewModel"/>.</summary>
-		//public ConfigureViewModel ViewModel => DataContext as ConfigureViewModel;
+    #region Properties
 
-		#endregion
+    /// <summary>Gets the <see cref="ConfigureViewModel"/>.</summary>
+    //public ConfigureViewModel ViewModel => DataContext as ConfigureViewModel;
 
-		#region Event Handlers
+    #endregion
 
-		private void OnLoaded(object sender, RoutedEventArgs e) {
-			//ViewModel.WindowOwner = this;
-		}
+    #region Event Handlers
 
-		private void OnSourceInitialized(object sender, EventArgs e) {
-			this.ShowMaximizeMinimize(false, false);
-		}
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        //ViewModel.WindowOwner = this;
+    }
 
-		private void OnOK(object sender, RoutedEventArgs e) {
-			DialogResult = true;
-		}
+    private void OnSourceInitialized(object sender, EventArgs e)
+    {
+        this.ShowMaximizeMinimize(false, false);
+    }
 
-		#endregion
-	}
+    private void OnOK(object sender, RoutedEventArgs e)
+    {
+        DialogResult = true;
+    }
+
+    #endregion
 }

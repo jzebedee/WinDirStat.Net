@@ -43,16 +43,22 @@ namespace System.IO.Filesystem.Ntfs
             {
                 IList<INtfsStream> streams = node.Streams;
                 if (streams == null || streams.Count == 0)
+                {
                     continue;
+                }
 
                 IList<INtfsFragment> fragments = streams[0].Fragments;
                 if (fragments == null)
+                {
                     continue;
+                }
 
                 UInt32 fragmentCount = (UInt32)fragments.Count;
 
                 if (fragmentCount < minimumFragments)
+                {
                     continue;
+                }
 
                 List<INtfsNode> nodeList;
                 fragmentsAggregate.TryGetValue(fragmentCount, out nodeList);
@@ -76,7 +82,9 @@ namespace System.IO.Filesystem.Ntfs
             foreach (INtfsNode node in nodes)
             {
                 if ((node.Attributes & FileAttributes.Directory) != 0 || node.Size < minimumSize)
+                {
                     continue;
+                }
 
                 List<INtfsNode> nodeList;
                 sizeAggregate.TryGetValue(node.Size, out nodeList);

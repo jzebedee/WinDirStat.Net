@@ -5,33 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using WinDirStat.Net.Services;
 
-namespace WinDirStat.Net.Rendering {
-	/// <summary>A factory for treemap renderers.</summary>
-	public class TreemapRendererFactory {
+namespace WinDirStat.Net.Rendering;
 
-		#region Fields
+/// <summary>A factory for treemap renderers.</summary>
+public class TreemapRendererFactory
+{
 
-		/// <summary>The UI service.</summary>
-		private readonly UIService ui;
+    #region Fields
 
-		#endregion
+    /// <summary>The UI service.</summary>
+    private readonly UIService ui;
 
-		#region Constructors
+    #endregion
 
-		/// <summary>Constructs the<see cref="TreemapRendererFactory"/>.</summary>
-		public TreemapRendererFactory(UIService ui) {
-			this.ui = ui;
-		}
+    #region Constructors
 
-		#endregion
+    /// <summary>Constructs the<see cref="TreemapRendererFactory"/>.</summary>
+    public TreemapRendererFactory(UIService ui)
+    {
+        this.ui = ui;
+    }
 
-		#region TreemapRenderer Factory
+    #endregion
 
-		/// <summary>Constructs a new <see cref="TreemapRenderer"/>.</summary>
-		public TreemapRenderer Create() {
-			return new TreemapRenderer(ui);
-		}
+    #region TreemapRenderer Factory
 
-		#endregion
-	}
+    /// <summary>Constructs a new <see cref="TreemapRenderer"/>.</summary>
+    public TreemapRenderer Create()
+    {
+        return new TreemapRenderer(ui);
+    }
+
+    #endregion
 }

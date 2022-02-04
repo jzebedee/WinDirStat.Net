@@ -4,34 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinDirStat.Net.Utils {
-	/// <summary>An interface for a volatile container type.</summary>
-	public interface IVolatile {
+namespace WinDirStat.Net.Utils;
 
-		#region Properties
+/// <summary>An interface for a volatile container type.</summary>
+public interface IVolatile
+{
 
-		/// <summary>Gets the <see cref="object"/> value.</summary>
-		object Value { get; }
-		/// <summary>Gets the lock context.</summary>
-		object LockObj { get; }
+    #region Properties
 
-		#endregion
+    /// <summary>Gets the <see cref="object"/> value.</summary>
+    object Value { get; }
+    /// <summary>Gets the lock context.</summary>
+    object LockObj { get; }
 
-		#region Locking
+    #endregion
 
-		/// <summary>Locks the value.</summary>
-		void Lock();
-		/// <summary>Unlocks the value.</summary>
-		void Unlock();
+    #region Locking
 
-		#endregion
+    /// <summary>Locks the value.</summary>
+    void Lock();
+    /// <summary>Unlocks the value.</summary>
+    void Unlock();
 
-		#region Volatile Operators
+    #endregion
 
-		/// <summary>Sets the value.</summary>
-		object Set(object o);
+    #region Volatile Operators
 
-		#endregion
+    /// <summary>Sets the value.</summary>
+    object Set(object o);
 
-	}
+    #endregion
+
 }

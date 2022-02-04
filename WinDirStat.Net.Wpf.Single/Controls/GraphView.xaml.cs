@@ -18,115 +18,133 @@ using WinDirStat.Net.Structures;
 using WinDirStat.Net.ViewModel;
 using WinDirStat.Net.Wpf.Utils;
 
-namespace WinDirStat.Net.Wpf.Controls {
-    public class GraphViewHoverEventArgs : RoutedEventArgs {
+namespace WinDirStat.Net.Wpf.Controls;
 
-        public FileItemBase Hover;
+public class GraphViewHoverEventArgs : RoutedEventArgs
+{
 
-        public GraphViewHoverEventArgs(RoutedEvent routedEvent, FileItemBase hover)
-            : base(routedEvent) {
-            Hover = hover;
+    public FileItemBase Hover;
+
+    public GraphViewHoverEventArgs(RoutedEvent routedEvent, FileItemBase hover)
+        : base(routedEvent)
+    {
+        Hover = hover;
+    }
+}
+
+public delegate void GraphViewHoverEventHandler(object sender, GraphViewHoverEventArgs e);
+
+
+/// <summary>
+/// Interaction logic for WpfGraphView.xaml
+/// </summary>
+public partial class GraphView : UserControl
+{
+
+    public enum HighlightMode
+    {
+        None,
+        Extension,
+        Selection,
+    }
+
+    public static readonly DependencyProperty RootProperty =
+        DependencyProperty.Register("Root", typeof(FileItemBase), typeof(GraphView),
+            new FrameworkPropertyMetadata(null, OnRootChanged));
+
+    private static async void OnRootChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not GraphView graphView)
+        {
+            return;
+        }
+
+        FileItemBase root = graphView.Root;
+        //if (root == null) {
+        //    await graphView.AbortRenderAsync();
+        //}
+
+        graphView.root = root;
+        graphView.HighlightNone();
+        graphView.Hover = null;
+        if (root != null)
+        {
+            await graphView.RenderAsync();
+        }
+        else
+        {
+            var render = graphView.renderTask;
+            if (render != null)
+            {
+                await render;
+            }
+            graphView.Clear();
         }
     }
 
-    public delegate void GraphViewHoverEventHandler(object sender, GraphViewHoverEventArgs e);
+    public FileItemBase Root
+    {
+        get => (FileItemBase)GetValue(RootProperty);
+        set => SetValue(RootProperty, value);
+    }
 
+    private static readonly DependencyPropertyKey HoverPropertyKey =
+        DependencyProperty.RegisterReadOnly("Hover", typeof(FileItemBase), typeof(GraphView),
+            new FrameworkPropertyMetadata(null, OnHoverChanged));
 
-    /// <summary>
-    /// Interaction logic for WpfGraphView.xaml
-    /// </summary>
-    public partial class GraphView : UserControl {
+    public static readonly DependencyProperty HoverProperty =
+        HoverPropertyKey.DependencyProperty;
 
-        public enum HighlightMode {
-            None,
-            Extension,
-            Selection,
+    private static void OnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is GraphView graphView)
+        {
+            FileItemBase hover = e.NewValue as FileItemBase;
+            graphView.HasHover = hover != null;
+            graphView.RaiseEvent(new GraphViewHoverEventArgs(HoverChangedEvent, hover));
         }
+    }
 
-        public static readonly DependencyProperty RootProperty =
-            DependencyProperty.Register("Root", typeof(FileItemBase), typeof(GraphView),
-                new FrameworkPropertyMetadata(null, OnRootChanged));
+    public FileItemBase Hover
+    {
+        get => (FileItemBase)GetValue(HoverProperty);
+        private set => SetValue(HoverPropertyKey, value);
+    }
 
-        private static async void OnRootChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is not GraphView graphView)
-                return;
+    private static readonly DependencyPropertyKey HasHoverPropertyKey =
+        DependencyProperty.RegisterReadOnly("HasHover", typeof(bool), typeof(GraphView),
+            new FrameworkPropertyMetadata(false));
 
-            FileItemBase root = graphView.Root;
-            //if (root == null) {
-            //    await graphView.AbortRenderAsync();
-            //}
+    public static readonly DependencyProperty HasHoverProperty =
+        HasHoverPropertyKey.DependencyProperty;
 
-            graphView.root = root;
-            graphView.HighlightNone();
-            graphView.Hover = null;
-            if (root != null) {
-                await graphView.RenderAsync();
-            }
-            else {
-                var render = graphView.renderTask;
-                if (render != null) {
-                    await render;
-                }
-                graphView.Clear();
-            }
-        }
+    public bool HasHover
+    {
+        get => (bool)GetValue(HasHoverProperty);
+        private set => SetValue(HasHoverPropertyKey, value);
+    }
 
-        public FileItemBase Root {
-            get => (FileItemBase) GetValue(RootProperty);
-            set => SetValue(RootProperty, value);
-        }
+    public static readonly RoutedEvent HoverChangedEvent =
+        EventManager.RegisterRoutedEvent("HoverChanged", RoutingStrategy.Bubble,
+            typeof(GraphViewHoverEventHandler), typeof(GraphView));
 
-        private static readonly DependencyPropertyKey HoverPropertyKey =
-            DependencyProperty.RegisterReadOnly("Hover", typeof(FileItemBase), typeof(GraphView),
-                new FrameworkPropertyMetadata(null, OnHoverChanged));
+    public event GraphViewHoverEventHandler HoverChanged
+    {
+        add => AddHandler(HoverChangedEvent, value);
+        remove => RemoveHandler(HoverChangedEvent, value);
+    }
 
-        public static readonly DependencyProperty HoverProperty =
-            HoverPropertyKey.DependencyProperty;
+    private static readonly DependencyProperty RenderPriorityProperty =
+        DependencyProperty.Register("RenderPriority", typeof(ThreadPriority), typeof(GraphView),
+            new FrameworkPropertyMetadata(ThreadPriority.BelowNormal));
 
-        private static void OnHoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is GraphView graphView) {
-                FileItemBase hover = e.NewValue as FileItemBase;
-                graphView.HasHover = hover != null;
-                graphView.RaiseEvent(new GraphViewHoverEventArgs(HoverChangedEvent, hover));
-            }
-        }
+    public ThreadPriority RenderPriority
+    {
+        get => (ThreadPriority)GetValue(RenderPriorityProperty);
+        set => SetValue(RenderPriorityProperty, value);
+    }
 
-        public FileItemBase Hover {
-            get => (FileItemBase) GetValue(HoverProperty);
-            private set => SetValue(HoverPropertyKey, value);
-        }
-
-        private static readonly DependencyPropertyKey HasHoverPropertyKey =
-            DependencyProperty.RegisterReadOnly("HasHover", typeof(bool), typeof(GraphView),
-                new FrameworkPropertyMetadata(false));
-
-        public static readonly DependencyProperty HasHoverProperty =
-            HasHoverPropertyKey.DependencyProperty;
-
-        public bool HasHover {
-            get => (bool) GetValue(HasHoverProperty);
-            private set => SetValue(HasHoverPropertyKey, value);
-        }
-
-        public static readonly RoutedEvent HoverChangedEvent =
-            EventManager.RegisterRoutedEvent("HoverChanged", RoutingStrategy.Bubble,
-                typeof(GraphViewHoverEventHandler), typeof(GraphView));
-
-        public event GraphViewHoverEventHandler HoverChanged {
-            add => AddHandler(HoverChangedEvent, value);
-            remove => RemoveHandler(HoverChangedEvent, value);
-        }
-
-        private static readonly DependencyProperty RenderPriorityProperty =
-            DependencyProperty.Register("RenderPriority", typeof(ThreadPriority), typeof(GraphView),
-                new FrameworkPropertyMetadata(ThreadPriority.BelowNormal));
-
-        public ThreadPriority RenderPriority {
-            get => (ThreadPriority) GetValue(RenderPriorityProperty);
-            set => SetValue(RenderPriorityProperty, value);
-        }
-
-        /*private static readonly DependencyProperty ForceDimmedProperty =
+    /*private static readonly DependencyProperty ForceDimmedProperty =
 			DependencyProperty.Register("ForceDimmed", typeof(bool), typeof(GraphView),
 				new FrameworkPropertyMetadata(false, OnForceDimmedChanged));
 
@@ -153,326 +171,402 @@ namespace WinDirStat.Net.Wpf.Controls {
 			}
 		}*/
 
-        private static async void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is not GraphView graphView)
-                return;
-
-            graphView.UpdateDimmed();
-            if (graphView.IsEnabled) {
-                // GraphView will render if (!IsEnabled and Root != null)
-                await graphView.RenderAsync();
-            }
+    private static async void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not GraphView graphView)
+        {
+            return;
         }
 
-        private void UpdateDimmed() => IsDimmed = IsRenderingTreemap || resizing || !IsEnabled;
+        graphView.UpdateDimmed();
+        if (graphView.IsEnabled)
+        {
+            // GraphView will render if (!IsEnabled and Root != null)
+            await graphView.RenderAsync();
+        }
+    }
 
-        private static readonly DependencyPropertyKey IsDimmedPropertyKey =
-            DependencyProperty.RegisterReadOnly("IsDimmed", typeof(bool), typeof(GraphView),
-                new FrameworkPropertyMetadata(false, OnIsDimmedChanged));
+    private void UpdateDimmed() => IsDimmed = IsRenderingTreemap || resizing || !IsEnabled;
 
-        private static void OnIsDimmedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            GraphView graphView = (GraphView) d;
+    private static readonly DependencyPropertyKey IsDimmedPropertyKey =
+        DependencyProperty.RegisterReadOnly("IsDimmed", typeof(bool), typeof(GraphView),
+            new FrameworkPropertyMetadata(false, OnIsDimmedChanged));
 
-            if (graphView.IsDimmed)
-                graphView.Hover = null;
-            else if (graphView.IsMouseOver)
-                graphView.UpdateHover();
+    private static void OnIsDimmedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        GraphView graphView = (GraphView)d;
+
+        if (graphView.IsDimmed)
+        {
+            graphView.Hover = null;
+        }
+        else if (graphView.IsMouseOver)
+        {
+            graphView.UpdateHover();
+        }
+    }
+
+    public static readonly DependencyProperty IsDimmedProperty =
+        IsDimmedPropertyKey.DependencyProperty;
+
+    public bool IsDimmed
+    {
+        get => (bool)GetValue(IsDimmedProperty);
+        private set => SetValue(IsDimmedPropertyKey, value);
+    }
+
+    private static void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        GraphView graphView = (GraphView)d;
+        MainViewModel oldViewModel = e.OldValue as MainViewModel;
+        MainViewModel newViewModel = e.NewValue as MainViewModel;
+
+        if (oldViewModel != null)
+        {
+            oldViewModel.Settings.PropertyChanged -= graphView.OnSettingsChanged;
         }
 
-        public static readonly DependencyProperty IsDimmedProperty =
-            IsDimmedPropertyKey.DependencyProperty;
-
-        public bool IsDimmed {
-            get => (bool) GetValue(IsDimmedProperty);
-            private set => SetValue(IsDimmedPropertyKey, value);
+        if (graphView.IsLoaded && newViewModel != null)
+        {
+            newViewModel.Settings.PropertyChanged += graphView.OnSettingsChanged;
         }
 
-        private static void OnDataContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            GraphView graphView = (GraphView) d;
-            MainViewModel oldViewModel = e.OldValue as MainViewModel;
-            MainViewModel newViewModel = e.NewValue as MainViewModel;
+        graphView.ViewModel = newViewModel;
+    }
 
-            if (oldViewModel != null)
-                oldViewModel.Settings.PropertyChanged -= graphView.OnSettingsChanged;
-            if (graphView.IsLoaded && newViewModel != null)
-                newViewModel.Settings.PropertyChanged += graphView.OnSettingsChanged;
-            graphView.ViewModel = newViewModel;
-        }
-
-        private async void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
-            switch (e.PropertyName) {
-                case nameof(SettingsService.TreemapOptions):
-                case nameof(SettingsService.FilePalette):
-                    await RenderAsync();
-                    break;
-                case nameof(SettingsService.HighlightColor):
-                    if (highlightMode != HighlightMode.None)
-                        RenderHighlight(treemapSize);
-                    break;
-            }
-        }
-        private Point2I treemapSize;
-        private WriteableBitmap treemap;
-        private Point2I highlightSize;
-        private WriteableBitmap highlight;
-        private readonly DispatcherTimer resizeTimer;
-
-        private Task renderTask;
-        private AutoResetEvent renderGate;
-
-        private FileItemBase root;
-        private bool resizing;
-        /// <summary>Check if the running render thread has finished rendering the treemap.</summary>
-        private volatile bool treemapRendered;
-        private volatile bool fullRender;
-        //private TreemapOptions options;
-
-        private FileItemBase[] selection;
-        private string extension;
-        private HighlightMode highlightMode;
-
-        static GraphView() {
-            DataContextProperty.AddOwner(typeof(GraphView),
-                new FrameworkPropertyMetadata(OnDataContextChanged));
-            IsEnabledProperty.AddOwner(typeof(GraphView),
-                new FrameworkPropertyMetadata(OnIsEnabledChanged));
-        }
-
-        public GraphView() {
-            if (!this.DesignerInitializeComponent("Controls"))
-                InitializeComponent();
-
-            renderGate = new(true);
-            resizeTimer = new DispatcherTimer(
-                TimeSpan.FromMilliseconds(50),
-                DispatcherPriority.Normal,
-                OnResizeTimerTick,
-                Dispatcher);
-            resizeTimer.Stop();
-            treemapSize = Point2I.Zero;
-            highlightSize = Point2I.Zero;
-            highlightMode = HighlightMode.None;
-            treemapRendered = true;
-        }
-
-        public void HighlightNone() {
-            highlightMode = HighlightMode.None;
-            extension = null;
-            selection = null;
-            imageHighlight.Source = null;
-        }
-
-        public async void HighlightExtension(string extension) {
-            if (this.extension == extension)
-                return;
-
-            highlightMode = HighlightMode.Extension;
-            this.extension = extension;
-            selection = null;
-            if (IsRendering) {
-                await RenderHighlightAsync();
-            }
-            else if (!IsDimmed && Root != null) {
-                RenderHighlight(treemapSize);
-                if (imageHighlight.Source != highlight)
-                    imageHighlight.Source = highlight;
-            }
-            //RenderHighlightAsync(ThreadPriority.Normal);
-            //Render(true);
-        }
-
-        public async void HighlightSelection(IEnumerable selection) {
-            if (this.selection != null && this.selection.Intersect(selection.Cast<FileItemBase>()).Count() == this.selection.Length)
-                return;
-
-            highlightMode = HighlightMode.Selection;
-            this.selection = selection.Cast<FileItemBase>().ToArray();
-            extension = null;
-            if (IsRendering) {
-                await RenderHighlightAsync();
-            }
-            else if (!IsDimmed && Root != null) {
-                RenderHighlight(treemapSize);
-                if (imageHighlight.Source != highlight)
-                    imageHighlight.Source = highlight;
-            }
-            //RenderHighlightAsync(ThreadPriority.Normal);
-            //Render(true);
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e) {
-            resizeTimer.Start();
-        }
-
-        private void OnUnloaded(object sender, RoutedEventArgs e) {
-            resizeTimer.Stop();
-            //await AbortRenderAsync();
-        }
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            resizing = true;
-            IsDimmed = true;
-            // Restart the timer by stopping it first
-            resizeTimer.Stop();
-            resizeTimer.Start();
-        }
-
-        private async void OnResizeTimerTick(object sender, EventArgs e) {
-            resizing = false;
-            resizeTimer.Stop();
-            await RenderAsync();
-        }
-
-
-
-        /// <summary>Gets if anything is in the process of being rendered.</summary>
-        private bool IsRendering => !renderTask?.IsCompleted ?? false;
-
-        /// <summary>Gets if the treemap is in the process of being rendered.</summary>
-        private bool IsRenderingTreemap => fullRender && IsRendering;
-
-        /// <summary>A link to the view model that can be accessed outside of the UI thread.</summary>
-        private MainViewModel ViewModel { get; set; }
-        private SettingsService Settings => ViewModel.Settings;
-        private TreemapRenderer Treemap => ViewModel.Treemap;
-
-        private TreemapOptions Options {
-            get => Settings.TreemapOptions;
-        }
-        private Rgba32Color HighlightColor {
-            get => Settings.HighlightColor;
-        }
-
-        private void Clear() {
-            //await AbortRenderAsync();
-            treemap = null;
-            highlight = null;
-            treemapSize = Point2I.Zero;
-            highlightSize = Point2I.Zero;
-        }
-
-        //public async Task AbortRenderAsync(bool waitForExit = true) {
-        //    //FIXME: waitForExit was never observed anyway
-        //    if (waitForExit && IsRendering) {
-        //        await renderTask;
-        //    }
-        //    UpdateDimmed();
-        //}
-
-        public Task RenderHighlightAsync(ThreadPriority? priority = null) {
-            fullRender = !treemapRendered;
-            return RenderCoreAsync(priority);
-        }
-
-        public Task RenderAsync(ThreadPriority? priority = null) {
-            fullRender = true;
-            return RenderCoreAsync(priority);
-        }
-
-        private async Task RenderCoreAsync(ThreadPriority? priority = null) {
-            if (!IsEnabled)
-                return;
-
-            if (Root == null)
-                return;
-
-            var acquired = renderGate.WaitOne(0);
-            if (!acquired)
-                return;
-
-            //await AbortRenderAsync();
-            treemapRendered = false;
-
-            var size = new Point2I((int) ActualWidth, (int) ActualHeight);
-
-            Debug.Assert(renderTask == null || renderTask.IsCompleted);
-            renderTask = Task.Run(() => RenderWorker(size));
-            UpdateDimmed();
-            await renderTask;
-
-            Dispatcher.Invoke(RenderFinished);
-        }
-
-        private void RenderWorker(Point2I size) {
-            if (size.X != 0 && size.Y != 0) {
-                if (fullRender) {
-                    RenderTreemap(size);
+    private async void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(SettingsService.TreemapOptions):
+            case nameof(SettingsService.FilePalette):
+                await RenderAsync();
+                break;
+            case nameof(SettingsService.HighlightColor):
+                if (highlightMode != HighlightMode.None)
+                {
+                    RenderHighlight(treemapSize);
                 }
-                treemapRendered = true;
 
-                if (highlightMode != HighlightMode.None) {
-                    RenderHighlight(size);
-                }
-            }
+                break;
+        }
+    }
+    private Point2I treemapSize;
+    private WriteableBitmap treemap;
+    private Point2I highlightSize;
+    private WriteableBitmap highlight;
+    private readonly DispatcherTimer resizeTimer;
+
+    private Task renderTask;
+    private AutoResetEvent renderGate;
+
+    private FileItemBase root;
+    private bool resizing;
+    /// <summary>Check if the running render thread has finished rendering the treemap.</summary>
+    private volatile bool treemapRendered;
+    private volatile bool fullRender;
+    //private TreemapOptions options;
+
+    private FileItemBase[] selection;
+    private string extension;
+    private HighlightMode highlightMode;
+
+    static GraphView()
+    {
+        DataContextProperty.AddOwner(typeof(GraphView),
+            new FrameworkPropertyMetadata(OnDataContextChanged));
+        IsEnabledProperty.AddOwner(typeof(GraphView),
+            new FrameworkPropertyMetadata(OnIsEnabledChanged));
+    }
+
+    public GraphView()
+    {
+        if (!this.DesignerInitializeComponent("Controls"))
+        {
+            InitializeComponent();
         }
 
-        private void RenderFinished() {
-            // Let the control know we're not rendering anymore
-            imageTreemap.Source = treemap;
-            if (highlightMode != HighlightMode.None) {
+        renderGate = new(true);
+        resizeTimer = new DispatcherTimer(
+            TimeSpan.FromMilliseconds(50),
+            DispatcherPriority.Normal,
+            OnResizeTimerTick,
+            Dispatcher);
+        resizeTimer.Stop();
+        treemapSize = Point2I.Zero;
+        highlightSize = Point2I.Zero;
+        highlightMode = HighlightMode.None;
+        treemapRendered = true;
+    }
+
+    public void HighlightNone()
+    {
+        highlightMode = HighlightMode.None;
+        extension = null;
+        selection = null;
+        imageHighlight.Source = null;
+    }
+
+    public async void HighlightExtension(string extension)
+    {
+        if (this.extension == extension)
+        {
+            return;
+        }
+
+        highlightMode = HighlightMode.Extension;
+        this.extension = extension;
+        selection = null;
+        if (IsRendering)
+        {
+            await RenderHighlightAsync();
+        }
+        else if (!IsDimmed && Root != null)
+        {
+            RenderHighlight(treemapSize);
+            if (imageHighlight.Source != highlight)
+            {
                 imageHighlight.Source = highlight;
             }
-            UpdateDimmed();
+        }
+        //RenderHighlightAsync(ThreadPriority.Normal);
+        //Render(true);
+    }
 
-            renderGate.Set();
+    public async void HighlightSelection(IEnumerable selection)
+    {
+        if (this.selection != null && this.selection.Intersect(selection.Cast<FileItemBase>()).Count() == this.selection.Length)
+        {
+            return;
         }
 
-        private void RenderTreemap(Point2I size) {
-            Stopwatch sw = Stopwatch.StartNew();
-            if (treemap == null || treemapSize != size) {
-                treemapSize = size;
-                //treemap = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null);
-                Dispatcher.Invoke(() => treemap = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
-            }
-            Treemap.DrawTreemap(treemap, new Rectangle2I(size), root);
-            sw.Stop();
-
-            Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to render treemap");
+        highlightMode = HighlightMode.Selection;
+        this.selection = selection.Cast<FileItemBase>().ToArray();
+        extension = null;
+        if (IsRendering)
+        {
+            await RenderHighlightAsync();
         }
-        private void RenderHighlight(Point2I size) {
-            Stopwatch sw = Stopwatch.StartNew();
-            if (highlight == null || highlightSize != size) {
-                highlightSize = size;
-                //highlight = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null);
-                Dispatcher.Invoke(() => highlight = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
+        else if (!IsDimmed && Root != null)
+        {
+            RenderHighlight(treemapSize);
+            if (imageHighlight.Source != highlight)
+            {
+                imageHighlight.Source = highlight;
             }
-            sw.Stop();
-            Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to setup highlight bitmap");
+        }
+        //RenderHighlightAsync(ThreadPriority.Normal);
+        //Render(true);
+    }
 
-            sw.Restart();
-            if (highlightMode == HighlightMode.Extension) {
-                Treemap.HighlightExtensions(highlight, new Rectangle2I(size), root, Settings.HighlightColor, extension);
-            }
-            else if (highlightMode == HighlightMode.Selection) {
-                Treemap.HighlightItems(highlight, new Rectangle2I(size), Settings.HighlightColor, selection);
-            }
-            sw.Stop();
-            Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to render highlight");
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        resizeTimer.Start();
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        resizeTimer.Stop();
+        //await AbortRenderAsync();
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        resizing = true;
+        IsDimmed = true;
+        // Restart the timer by stopping it first
+        resizeTimer.Stop();
+        resizeTimer.Start();
+    }
+
+    private async void OnResizeTimerTick(object sender, EventArgs e)
+    {
+        resizing = false;
+        resizeTimer.Stop();
+        await RenderAsync();
+    }
+
+
+
+    /// <summary>Gets if anything is in the process of being rendered.</summary>
+    private bool IsRendering => !renderTask?.IsCompleted ?? false;
+
+    /// <summary>Gets if the treemap is in the process of being rendered.</summary>
+    private bool IsRenderingTreemap => fullRender && IsRendering;
+
+    /// <summary>A link to the view model that can be accessed outside of the UI thread.</summary>
+    private MainViewModel ViewModel { get; set; }
+    private SettingsService Settings => ViewModel.Settings;
+    private TreemapRenderer Treemap => ViewModel.Treemap;
+
+    private TreemapOptions Options
+    {
+        get => Settings.TreemapOptions;
+    }
+    private Rgba32Color HighlightColor
+    {
+        get => Settings.HighlightColor;
+    }
+
+    private void Clear()
+    {
+        //await AbortRenderAsync();
+        treemap = null;
+        highlight = null;
+        treemapSize = Point2I.Zero;
+        highlightSize = Point2I.Zero;
+    }
+
+    //public async Task AbortRenderAsync(bool waitForExit = true) {
+    //    //FIXME: waitForExit was never observed anyway
+    //    if (waitForExit && IsRendering) {
+    //        await renderTask;
+    //    }
+    //    UpdateDimmed();
+    //}
+
+    public Task RenderHighlightAsync(ThreadPriority? priority = null)
+    {
+        fullRender = !treemapRendered;
+        return RenderCoreAsync(priority);
+    }
+
+    public Task RenderAsync(ThreadPriority? priority = null)
+    {
+        fullRender = true;
+        return RenderCoreAsync(priority);
+    }
+
+    private async Task RenderCoreAsync(ThreadPriority? priority = null)
+    {
+        if (!IsEnabled)
+        {
+            return;
         }
 
-        private void OnMouseMove(object sender, MouseEventArgs e) {
-            UpdateHover((Point2I) e.GetPosition(this));
+        if (Root == null)
+        {
+            return;
         }
 
-        private void OnMouseLeave(object sender, MouseEventArgs e) {
+        var acquired = renderGate.WaitOne(0);
+        if (!acquired)
+        {
+            return;
+        }
+
+        //await AbortRenderAsync();
+        treemapRendered = false;
+
+        var size = new Point2I((int)ActualWidth, (int)ActualHeight);
+
+        Debug.Assert(renderTask == null || renderTask.IsCompleted);
+        renderTask = Task.Run(() => RenderWorker(size));
+        UpdateDimmed();
+        await renderTask;
+
+        Dispatcher.Invoke(RenderFinished);
+    }
+
+    private void RenderWorker(Point2I size)
+    {
+        if (size.X != 0 && size.Y != 0)
+        {
+            if (fullRender)
+            {
+                RenderTreemap(size);
+            }
+            treemapRendered = true;
+
+            if (highlightMode != HighlightMode.None)
+            {
+                RenderHighlight(size);
+            }
+        }
+    }
+
+    private void RenderFinished()
+    {
+        // Let the control know we're not rendering anymore
+        imageTreemap.Source = treemap;
+        if (highlightMode != HighlightMode.None)
+        {
+            imageHighlight.Source = highlight;
+        }
+        UpdateDimmed();
+
+        renderGate.Set();
+    }
+
+    private void RenderTreemap(Point2I size)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+        if (treemap == null || treemapSize != size)
+        {
+            treemapSize = size;
+            //treemap = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null);
+            Dispatcher.Invoke(() => treemap = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
+        }
+        Treemap.DrawTreemap(treemap, new Rectangle2I(size), root);
+        sw.Stop();
+
+        Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to render treemap");
+    }
+    private void RenderHighlight(Point2I size)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+        if (highlight == null || highlightSize != size)
+        {
+            highlightSize = size;
+            //highlight = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null);
+            Dispatcher.Invoke(() => highlight = new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
+        }
+        sw.Stop();
+        Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to setup highlight bitmap");
+
+        sw.Restart();
+        if (highlightMode == HighlightMode.Extension)
+        {
+            Treemap.HighlightExtensions(highlight, new Rectangle2I(size), root, Settings.HighlightColor, extension);
+        }
+        else if (highlightMode == HighlightMode.Selection)
+        {
+            Treemap.HighlightItems(highlight, new Rectangle2I(size), Settings.HighlightColor, selection);
+        }
+        sw.Stop();
+        Debug.WriteLine($"Took {sw.ElapsedMilliseconds}ms to render highlight");
+    }
+
+    private void OnMouseMove(object sender, MouseEventArgs e)
+    {
+        UpdateHover((Point2I)e.GetPosition(this));
+    }
+
+    private void OnMouseLeave(object sender, MouseEventArgs e)
+    {
+        Hover = null;
+    }
+
+    private void UpdateHover()
+    {
+        UpdateHover((Point2I)Mouse.GetPosition(this));
+    }
+
+    private void UpdateHover(Point2I point)
+    {
+        if (root == null)
+        {
             Hover = null;
+            return;
         }
-
-        private void UpdateHover() {
-            UpdateHover((Point2I) Mouse.GetPosition(this));
-        }
-
-        private void UpdateHover(Point2I point) {
-            if (root == null) {
-                Hover = null;
-                return;
+        if (Hover != null)
+        {
+            Rectangle2I rc = ((ITreemapItem)Hover).Rectangle;
+            if (rc.Contains(point))
+            {
+                return; // Hover is the same
             }
-            if (Hover != null) {
-                Rectangle2I rc = ((ITreemapItem) Hover).Rectangle;
-                if (rc.Contains(point))
-                    return; // Hover is the same
-            }
-            Hover = (FileItemBase) TreemapRenderer.FindItemAtPoint(root, point);
         }
+        Hover = (FileItemBase)TreemapRenderer.FindItemAtPoint(root, point);
     }
 }

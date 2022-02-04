@@ -24,19 +24,23 @@ using System.Windows.Controls;
 using System.Windows;
 using WinDirStat.Net.Wpf.Controls.SortList;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public class FileGridView : SortView {
-		static FileGridView() {
-			ItemContainerStyleKey =
-				new ComponentResourceKey(typeof(FileTreeView), "GridViewItemContainerStyleKey");
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-		public static ResourceKey ItemContainerStyleKey { get; private set; }
+public class FileGridView : SortView
+{
+    static FileGridView()
+    {
+        ItemContainerStyleKey =
+            new ComponentResourceKey(typeof(FileTreeView), "GridViewItemContainerStyleKey");
+    }
 
-		protected override object ItemContainerDefaultStyleKey {
-			get {
-				return ItemContainerStyleKey;
-			}
-		}
-	}
+    public static ResourceKey ItemContainerStyleKey { get; private set; }
+
+    protected override object ItemContainerDefaultStyleKey
+    {
+        get
+        {
+            return ItemContainerStyleKey;
+        }
+    }
 }

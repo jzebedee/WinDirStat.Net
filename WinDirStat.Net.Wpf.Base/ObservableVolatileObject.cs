@@ -1,41 +1,50 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace WinDirStat.Net {
-    /// <summary>An observable object with volatile get and set.</summary>
-    public class ObservableVolatileObject : ObservableObjectEx {
+namespace WinDirStat.Net;
 
-		/// <summary>The lock for volatile properties.</summary>
-		protected readonly object volatileLock = new object();
+/// <summary>An observable object with volatile get and set.</summary>
+public class ObservableVolatileObject : ObservableObjectEx
+{
 
-		/// <summary>Gets the property and ensures its under lock while accessing it.</summary>
-		/// 
-		/// <typeparam name="T">The type of the property.</typeparam>
-		/// <param name="field">The field to access.</param>
-		/// <returns>The locked value of the field.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected T VolatileGet<T>(ref T field) {
-			lock (volatileLock)
-				return field;
-		}
+    /// <summary>The lock for volatile properties.</summary>
+    protected readonly object volatileLock = new object();
 
-		/// <summary>Sets the property and ensures the property is not changed during the process.</summary>
-		/// 
-		/// <typeparam name="T">The type of the property.</typeparam>
-		/// <param name="field">The field of the property.</param>
-		/// <param name="newValue">The new value of the property.</param>
-		/// <param name="propertyName">The name of the property.</param>
-		/// <returns>True if the property was changed.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		protected bool VolatileSet<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null) {
-			lock (volatileLock) {
-				if (EqualityComparer<T>.Default.Equals(field, newValue))
-					return false;
-				field = newValue;
-			}
-			OnPropertyChanged(propertyName);
-			return true;
-		}
+    /// <summary>Gets the property and ensures its under lock while accessing it.</summary>
+    /// 
+    /// <typeparam name="T">The type of the property.</typeparam>
+    /// <param name="field">The field to access.</param>
+    /// <returns>The locked value of the field.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected T VolatileGet<T>(ref T field)
+    {
+        lock (volatileLock)
+        {
+            return field;
+        }
+    }
 
-	}
+    /// <summary>Sets the property and ensures the property is not changed during the process.</summary>
+    /// 
+    /// <typeparam name="T">The type of the property.</typeparam>
+    /// <param name="field">The field of the property.</param>
+    /// <param name="newValue">The new value of the property.</param>
+    /// <param name="propertyName">The name of the property.</param>
+    /// <returns>True if the property was changed.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool VolatileSet<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
+    {
+        lock (volatileLock)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                return false;
+            }
+
+            field = newValue;
+        }
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+
 }

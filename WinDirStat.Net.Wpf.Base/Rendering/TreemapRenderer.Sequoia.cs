@@ -12,8 +12,9 @@ using Number = System.Double;
 using Number = System.Single;
 #endif
 
-namespace WinDirStat.Net.Rendering {
-	unsafe partial class TreemapRenderer {
+namespace WinDirStat.Net.Rendering;
 
-	}
+unsafe partial class TreemapRenderer
+{
+
 }

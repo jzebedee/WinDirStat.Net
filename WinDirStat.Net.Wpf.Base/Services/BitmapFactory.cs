@@ -8,104 +8,115 @@ using System.Windows.Media.Imaging;
 using WinDirStat.Net.Structures;
 using WinDirStat.Net.Utils;
 
-namespace WinDirStat.Net.Services {
-    /// <summary>An service for creating and loading bitmaps.</summary>
-    public class BitmapFactory {
+namespace WinDirStat.Net.Services;
 
-		#region Fields
+/// <summary>An service for creating and loading bitmaps.</summary>
+public class BitmapFactory
+{
 
-		/// <summary>The service for performing UI actions such as dispatcher invoking.</summary>
-		private readonly UIService ui;
+    #region Fields
 
-		#endregion
+    /// <summary>The service for performing UI actions such as dispatcher invoking.</summary>
+    private readonly UIService ui;
 
-		#region Constructors
+    #endregion
 
-		/// <summary>Constructs the <see cref="BitmapFactory"/>.</summary>
-		public BitmapFactory(UIService ui) {
-			this.ui = ui;
-		}
+    #region Constructors
 
-		#endregion
+    /// <summary>Constructs the <see cref="BitmapFactory"/>.</summary>
+    public BitmapFactory(UIService ui)
+    {
+        this.ui = ui;
+    }
 
-		#region Create
+    #endregion
 
-		/// <summary>Creates a new writeable bitmap.</summary>
-		/// 
-		/// <param name="size">The size of the bitmap.</param>
-		/// <returns>The new writeable bitmap.</returns>
-		public WriteableBitmap CreateBitmap(Point2I size) {
-			return ui.Invoke(() => new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
-		}
+    #region Create
 
-		#endregion
+    /// <summary>Creates a new writeable bitmap.</summary>
+    /// 
+    /// <param name="size">The size of the bitmap.</param>
+    /// <returns>The new writeable bitmap.</returns>
+    public WriteableBitmap CreateBitmap(Point2I size)
+    {
+        return ui.Invoke(() => new WriteableBitmap(size.X, size.Y, 96, 96, PixelFormats.Bgra32, null));
+    }
 
-		#region From Source
+    #endregion
 
-		/// <summary>Loads a bitmap from the specified resource path.</summary>
-		/// 
-		/// <param name="resourcePath">The resource path to load the bitmap from.</param>
-		/// <param name="assembly">The assembly to load teh embedded resource from.</param>
-		/// <returns>The loaded bitmap.</returns>
-		public BitmapSource FromResource(string resourcePath, Assembly assembly = null) {
-			assembly = assembly ?? Assembly.GetCallingAssembly();
-			return ui.Invoke(() => {
-				BitmapImage bitmapImage = new BitmapImage();
-				bitmapImage.BeginInit();
-				bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				bitmapImage.UriSource = WpfUtils.MakePackUri(resourcePath, assembly);
-				bitmapImage.EndInit();
-				bitmapImage.Freeze();
-				return bitmapImage;
-			});
-		}
+    #region From Source
 
-		/// <summary>Loads a bitmap from the specified file path.</summary>
-		/// 
-		/// <param name="filePath">The file path to load the bitmap from.</param>
-		/// <returns>The loaded bitmap.</returns>
-		public BitmapSource FromFile(string filePath) {
-			return ui.Invoke(() => {
-				BitmapImage bitmapImage = new BitmapImage();
-				bitmapImage.BeginInit();
-				bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				bitmapImage.UriSource = new Uri(filePath);
-				bitmapImage.EndInit();
-				bitmapImage.Freeze();
-				return bitmapImage;
-			});
-		}
+    /// <summary>Loads a bitmap from the specified resource path.</summary>
+    /// 
+    /// <param name="resourcePath">The resource path to load the bitmap from.</param>
+    /// <param name="assembly">The assembly to load teh embedded resource from.</param>
+    /// <returns>The loaded bitmap.</returns>
+    public BitmapSource FromResource(string resourcePath, Assembly assembly = null)
+    {
+        assembly = assembly ?? Assembly.GetCallingAssembly();
+        return ui.Invoke(() =>
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.UriSource = WpfUtils.MakePackUri(resourcePath, assembly);
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return bitmapImage;
+        });
+    }
 
-		/// <summary>Loads a bitmap from the specified stream.</summary>
-		/// 
-		/// <param name="stream">The stream to load the bitmap from.</param>
-		/// <returns>The loaded bitmap.</returns>
-		public BitmapSource FromStream(Stream stream) {
-			return ui.Invoke(() => {
-				BitmapImage bitmapImage = new BitmapImage();
-				bitmapImage.BeginInit();
-				bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				bitmapImage.StreamSource = stream;
-				bitmapImage.EndInit();
-				bitmapImage.Freeze();
-				return bitmapImage;
-			});
-		}
+    /// <summary>Loads a bitmap from the specified file path.</summary>
+    /// 
+    /// <param name="filePath">The file path to load the bitmap from.</param>
+    /// <returns>The loaded bitmap.</returns>
+    public BitmapSource FromFile(string filePath)
+    {
+        return ui.Invoke(() =>
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.UriSource = new Uri(filePath);
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return bitmapImage;
+        });
+    }
 
-		/// <summary>Loads a bitmap from the specified icon handle.</summary>
-		/// 
-		/// <param name="handle">The handle of the icon to load.</param>
-		/// <returns>The loaded bitmap.</returns>
-		public BitmapSource FromHIcon(IntPtr hIcon) {
-			var bmpSource = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            bmpSource.Freeze();
-            return bmpSource;
-		}
+    /// <summary>Loads a bitmap from the specified stream.</summary>
+    /// 
+    /// <param name="stream">The stream to load the bitmap from.</param>
+    /// <returns>The loaded bitmap.</returns>
+    public BitmapSource FromStream(Stream stream)
+    {
+        return ui.Invoke(() =>
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.StreamSource = stream;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return bitmapImage;
+        });
+    }
 
-		#endregion
-	}
+    /// <summary>Loads a bitmap from the specified icon handle.</summary>
+    /// 
+    /// <param name="handle">The handle of the icon to load.</param>
+    /// <returns>The loaded bitmap.</returns>
+    public BitmapSource FromHIcon(IntPtr hIcon)
+    {
+        var bmpSource = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        bmpSource.Freeze();
+        return bmpSource;
+    }
 
-	/*/// <summary>An implementation for a UI-independent WPF bitmap.</summary>
+    #endregion
+}
+
+/*/// <summary>An implementation for a UI-independent WPF bitmap.</summary>
 	public class WpfBitmap : IBitmap {
 
 		#region Fields
@@ -195,4 +206,3 @@ namespace WinDirStat.Net.Services {
 
 		#endregion
 	}*/
-}

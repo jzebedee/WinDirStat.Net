@@ -23,11 +23,13 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public class InsertMarker : Control {
-		static InsertMarker() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(InsertMarker),
-				new FrameworkPropertyMetadata(typeof(InsertMarker)));
-		}
-	}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
+
+public class InsertMarker : Control
+{
+    static InsertMarker()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(InsertMarker),
+            new FrameworkPropertyMetadata(typeof(InsertMarker)));
+    }
 }

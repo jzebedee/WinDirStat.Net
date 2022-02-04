@@ -6,79 +6,88 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinDirStat.Net.Model.Files {
-	/// <summary>The file tree item that displays the amount of unused space in the drive.</summary>
-	[Serializable]
-	[DebuggerDisplay("{DebuggerDisplay,nq}")]
-	public sealed class FreeSpaceItem : FileItemBase {
-		
-		#region Fields
+namespace WinDirStat.Net.Model.Files;
 
-		/// <summary>The <see cref="RootItem"/> containing this space.</summary>
-		private readonly RootItem rootParent;
+/// <summary>The file tree item that displays the amount of unused space in the drive.</summary>
+[Serializable]
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed class FreeSpaceItem : FileItemBase
+{
 
-		#endregion
+    #region Fields
 
-		#region Constructors
+    /// <summary>The <see cref="RootItem"/> containing this space.</summary>
+    private readonly RootItem rootParent;
 
-		/// <summary>Constructs the <see cref="FreeSpaceItem"/>.</summary>
-		/// 
-		/// <param name="rootParent">The <see cref="RootItem"/> containing this space.</param>
-		internal FreeSpaceItem(RootItem rootParent)
-			: base(StringConstants.FreeSpaceName, FileItemType.FreeSpace, FileItemFlags.None)
-		{
-			this.rootParent = rootParent;
-			LastWriteTimeUtc = DateTime.MinValue;
-			UpdateSize();
-		}
+    #endregion
 
-		#endregion
+    #region Constructors
 
-		#region Helper Properties
+    /// <summary>Constructs the <see cref="FreeSpaceItem"/>.</summary>
+    /// 
+    /// <param name="rootParent">The <see cref="RootItem"/> containing this space.</param>
+    internal FreeSpaceItem(RootItem rootParent)
+        : base(StringConstants.FreeSpaceName, FileItemType.FreeSpace, FileItemFlags.None)
+    {
+        this.rootParent = rootParent;
+        LastWriteTimeUtc = DateTime.MinValue;
+        UpdateSize();
+    }
 
-		/// <summary>Gets the root path of <see cref="rootParent"/>.</summary>
-		private string VolumePath => rootParent.RootPath;
+    #endregion
 
-		#endregion
+    #region Helper Properties
 
-		#region Updating
+    /// <summary>Gets the root path of <see cref="rootParent"/>.</summary>
+    private string VolumePath => rootParent.RootPath;
 
-		/// <summary>Updates the size of the free space.</summary>
-		internal void UpdateSize() {
-			if (rootParent.Type == FileItemType.Computer) {
-				Size = 0;
-				List<FileItemBase> children = rootParent.Children;
-				lock (children) {
-					int count = children.Count;
-					for (int i = 0; i < count; i++) {
-						if (children[i] is RootItem root && root.FreeSpace != null) {
-							root.FreeSpace.UpdateSize();
-							Size += root.FreeSpace.Size;
-						}
-					}
-				}
-			}
-			else if (rootParent.Type == FileItemType.Volume) {
-				try {
-					DriveInfo driveInfo = new DriveInfo(VolumePath);
-					Size = driveInfo.TotalFreeSpace;
-				}
-				catch {
-					Size = 0;
-				}
-			}
-		}
+    #endregion
 
-		#endregion
+    #region Updating
 
-		#region ToString/DebuggerDisplay
+    /// <summary>Updates the size of the free space.</summary>
+    internal void UpdateSize()
+    {
+        if (rootParent.Type == FileItemType.Computer)
+        {
+            Size = 0;
+            List<FileItemBase> children = rootParent.Children;
+            lock (children)
+            {
+                int count = children.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    if (children[i] is RootItem root && root.FreeSpace != null)
+                    {
+                        root.FreeSpace.UpdateSize();
+                        Size += root.FreeSpace.Size;
+                    }
+                }
+            }
+        }
+        else if (rootParent.Type == FileItemType.Volume)
+        {
+            try
+            {
+                DriveInfo driveInfo = new DriveInfo(VolumePath);
+                Size = driveInfo.TotalFreeSpace;
+            }
+            catch
+            {
+                Size = 0;
+            }
+        }
+    }
 
-		/// <summary>Gets the string representation of this item.</summary>
-		public override string ToString() => "<Free Space>";
+    #endregion
 
-		/// <summary>Gets the string used to represent the file in the debugger.</summary>
-		private string DebuggerDisplay => "<Free Space>";
+    #region ToString/DebuggerDisplay
 
-		#endregion
-	}
+    /// <summary>Gets the string representation of this item.</summary>
+    public override string ToString() => "<Free Space>";
+
+    /// <summary>Gets the string used to represent the file in the debugger.</summary>
+    private string DebuggerDisplay => "<Free Space>";
+
+    #endregion
 }

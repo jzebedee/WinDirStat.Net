@@ -7,124 +7,155 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 
-namespace WinDirStat.Net.Wpf.Commands {
-    /// <summary>
-    /// A collection for defining relay command infos in XAML.
-    /// </summary>
-    /// <remarks>
-    /// Why is this not using the correct generic type you ask? Becaues the designer is shit.
-    /// </remarks>
-    public class RelayInfoCollection : ObservableCollection<object> {
+namespace WinDirStat.Net.Wpf.Commands;
 
-		#region Fields
+/// <summary>
+/// A collection for defining relay command infos in XAML.
+/// </summary>
+/// <remarks>
+/// Why is this not using the correct generic type you ask? Becaues the designer is shit.
+/// </remarks>
+public class RelayInfoCollection : ObservableCollection<object>
+{
 
-		private readonly Dictionary<string, PropertyInfo> commands = new Dictionary<string, PropertyInfo>();
-		private Type viewModelType = typeof(object);
-		private List<object> oldInfos = new List<object>();
-		private HashSet<string> oldNames = new HashSet<string>();
+    #region Fields
 
-		#endregion
+    private readonly Dictionary<string, PropertyInfo> commands = new Dictionary<string, PropertyInfo>();
+    private Type viewModelType = typeof(object);
+    private List<object> oldInfos = new List<object>();
+    private HashSet<string> oldNames = new HashSet<string>();
 
-		#region Constructors
+    #endregion
 
-		public RelayInfoCollection() {
-			CollectionChanged += OnCollectionChanged;
-		}
+    #region Constructors
 
-		#endregion
+    public RelayInfoCollection()
+    {
+        CollectionChanged += OnCollectionChanged;
+    }
 
-		#region Accessors
+    #endregion
 
-		public IRelayInfoCommand Get(object viewModel, string commandName) {
-			if (commands.TryGetValue(commandName, out PropertyInfo prop)) {
-				return (IRelayInfoCommand) prop.GetValue(viewModel);
-			}
-			return null;
-		}
+    #region Accessors
 
-		#endregion
+    public IRelayInfoCommand Get(object viewModel, string commandName)
+    {
+        if (commands.TryGetValue(commandName, out PropertyInfo prop))
+        {
+            return (IRelayInfoCommand)prop.GetValue(viewModel);
+        }
+        return null;
+    }
 
-		#region Properties
+    #endregion
 
-		public Type ViewModelType {
-			get => viewModelType;
-			set {
-				if (viewModelType == null)
-					throw new ArgumentNullException(nameof(ViewModelType));
-				if (viewModelType != value) {
-					viewModelType = value;
+    #region Properties
 
-					// Recollect all valid command names
-					commands.Clear();
-					foreach (PropertyInfo prop in viewModelType.GetProperties()) {
-						if (typeof(ICommand).IsAssignableFrom(prop.PropertyType)) {
-							commands.Add(prop.Name, prop);
-						}
-					}
+    public Type ViewModelType
+    {
+        get => viewModelType;
+        set
+        {
+            if (viewModelType == null)
+            {
+                throw new ArgumentNullException(nameof(ViewModelType));
+            }
 
-					Validate(this.Cast<RelayInfo>());
-				}
-			}
-		}
+            if (viewModelType != value)
+            {
+                viewModelType = value;
 
-		#endregion
+                // Recollect all valid command names
+                commands.Clear();
+                foreach (PropertyInfo prop in viewModelType.GetProperties())
+                {
+                    if (typeof(ICommand).IsAssignableFrom(prop.PropertyType))
+                    {
+                        commands.Add(prop.Name, prop);
+                    }
+                }
 
-		private void Validate(IEnumerable<RelayInfo> infos) {
-			foreach (RelayInfo info in infos)
-				Validate(info);
-		}
-		private void Validate(RelayInfo info) {
-			if (!string.IsNullOrEmpty(info.Name) && !commands.ContainsKey(info.Name))
-				throw new ArgumentException($"Command with name {info.Name} does not exist!");
-		}
+                Validate(this.Cast<RelayInfo>());
+            }
+        }
+    }
 
-		private void Unhook(IEnumerable<RelayInfo> infos) {
-			foreach (RelayInfo info in infos)
-				Unhook(info);
-		}
-		private void Unhook(RelayInfo info) {
-			info.PropertyChanged -= OnInfoPropertyChanged;
-		}
+    #endregion
 
-		private void Hook(IEnumerable<RelayInfo> infos) {
-			foreach (RelayInfo info in infos)
-				Hook(info);
-		}
-		private void Hook(RelayInfo info) {
-			info.PropertyChanged += OnInfoPropertyChanged;
-		}
+    private void Validate(IEnumerable<RelayInfo> infos)
+    {
+        foreach (RelayInfo info in infos)
+        {
+            Validate(info);
+        }
+    }
+    private void Validate(RelayInfo info)
+    {
+        if (!string.IsNullOrEmpty(info.Name) && !commands.ContainsKey(info.Name))
+        {
+            throw new ArgumentException($"Command with name {info.Name} does not exist!");
+        }
+    }
 
-		#region Event Handlers
+    private void Unhook(IEnumerable<RelayInfo> infos)
+    {
+        foreach (RelayInfo info in infos)
+        {
+            Unhook(info);
+        }
+    }
+    private void Unhook(RelayInfo info)
+    {
+        info.PropertyChanged -= OnInfoPropertyChanged;
+    }
 
-		private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-			switch (e.Action) {
-			case NotifyCollectionChangedAction.Reset:
-				Unhook(oldInfos.Cast<RelayInfo>());
-				Hook(this.Cast<RelayInfo>());
-				Validate(this.Cast<RelayInfo>());
-				break;
-			case NotifyCollectionChangedAction.Replace:
-				Unhook(e.OldItems.Cast<RelayInfo>());
-				Hook(e.NewItems.Cast<RelayInfo>());
-				Validate(e.NewItems.Cast<RelayInfo>());
-				break;
-			case NotifyCollectionChangedAction.Add:
-				Hook(e.NewItems.Cast<RelayInfo>());
-				Validate(e.NewItems.Cast<RelayInfo>());
-				break;
-			case NotifyCollectionChangedAction.Remove:
-				Unhook(e.OldItems.Cast<RelayInfo>());
-				break;
-			}
-			oldInfos = new List<object>(this);
-			oldNames = new HashSet<string>(this.Cast<RelayInfo>().Select(i => i.Name));
-		}
+    private void Hook(IEnumerable<RelayInfo> infos)
+    {
+        foreach (RelayInfo info in infos)
+        {
+            Hook(info);
+        }
+    }
+    private void Hook(RelayInfo info)
+    {
+        info.PropertyChanged += OnInfoPropertyChanged;
+    }
 
-		private void OnInfoPropertyChanged(object sender, PropertyChangedEventArgs e) {
-			if (e.PropertyName == nameof(RelayInfo.Name))
-				Validate((RelayInfo) sender);
-		}
+    #region Event Handlers
 
-		#endregion
-	}
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Reset:
+                Unhook(oldInfos.Cast<RelayInfo>());
+                Hook(this.Cast<RelayInfo>());
+                Validate(this.Cast<RelayInfo>());
+                break;
+            case NotifyCollectionChangedAction.Replace:
+                Unhook(e.OldItems.Cast<RelayInfo>());
+                Hook(e.NewItems.Cast<RelayInfo>());
+                Validate(e.NewItems.Cast<RelayInfo>());
+                break;
+            case NotifyCollectionChangedAction.Add:
+                Hook(e.NewItems.Cast<RelayInfo>());
+                Validate(e.NewItems.Cast<RelayInfo>());
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                Unhook(e.OldItems.Cast<RelayInfo>());
+                break;
+        }
+        oldInfos = new List<object>(this);
+        oldNames = new HashSet<string>(this.Cast<RelayInfo>().Select(i => i.Name));
+    }
+
+    private void OnInfoPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(RelayInfo.Name))
+        {
+            Validate((RelayInfo)sender);
+        }
+    }
+
+    #endregion
 }

@@ -27,58 +27,69 @@ using System.Windows.Input;
 using System.Diagnostics;
 using WinDirStat.Net.ViewModel.Files;
 
-namespace WinDirStat.Net.Wpf.Controls.FileList {
-	public class FileTreeViewItem : ListViewItem {
-		static FileTreeViewItem() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeViewItem),
-													 new FrameworkPropertyMetadata(typeof(FileTreeViewItem)));
-		}
+namespace WinDirStat.Net.Wpf.Controls.FileList;
 
-        public FileItemViewModel Node => DataContext as FileItemViewModel;
+public class FileTreeViewItem : ListViewItem
+{
+    static FileTreeViewItem()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(FileTreeViewItem),
+                                                 new FrameworkPropertyMetadata(typeof(FileTreeViewItem)));
+    }
 
-        public FileTreeNodeView NodeView { get; internal set; }
-		public FileTreeView ParentTreeView { get; internal set; }
+    public FileItemViewModel Node => DataContext as FileItemViewModel;
 
-		protected override void OnKeyDown(KeyEventArgs e) {
-			switch (e.Key) {
-			case Key.F2:
-				if (Node.IsEditable && ParentTreeView != null && ParentTreeView.SelectedItems.Count == 1 && ParentTreeView.SelectedItems[0] == Node) {
-					Node.IsEditing = true;
-					e.Handled = true;
-				}
-				break;
-			case Key.Escape:
-				if (Node.IsEditing) {
-					Node.IsEditing = false;
-					e.Handled = true;
-				}
-				break;
-			}
-		}
+    public FileTreeNodeView NodeView { get; internal set; }
+    public FileTreeView ParentTreeView { get; internal set; }
 
-		#region Mouse
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.F2:
+                if (Node.IsEditable && ParentTreeView != null && ParentTreeView.SelectedItems.Count == 1 && ParentTreeView.SelectedItems[0] == Node)
+                {
+                    Node.IsEditing = true;
+                    e.Handled = true;
+                }
+                break;
+            case Key.Escape:
+                if (Node.IsEditing)
+                {
+                    Node.IsEditing = false;
+                    e.Handled = true;
+                }
+                break;
+        }
+    }
 
-		Point startPoint;
-		bool wasSelected;
-		bool wasDoubleClick;
+    #region Mouse
 
-		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {
-			wasSelected = IsSelected;
-			if (!IsSelected) {
-				base.OnMouseLeftButtonDown(e);
-			}
+    Point startPoint;
+    bool wasSelected;
+    bool wasDoubleClick;
 
-			if (Mouse.LeftButton == MouseButtonState.Pressed) {
-				startPoint = e.GetPosition(null);
-				CaptureMouse();
+    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        wasSelected = IsSelected;
+        if (!IsSelected)
+        {
+            base.OnMouseLeftButtonDown(e);
+        }
 
-				if (e.ClickCount == 2) {
-					wasDoubleClick = true;
-				}
-			}
-		}
+        if (Mouse.LeftButton == MouseButtonState.Pressed)
+        {
+            startPoint = e.GetPosition(null);
+            CaptureMouse();
 
-		/*protected override void OnMouseMove(MouseEventArgs e) {
+            if (e.ClickCount == 2)
+            {
+                wasDoubleClick = true;
+            }
+        }
+    }
+
+    /*protected override void OnMouseMove(MouseEventArgs e) {
 			if (IsMouseCaptured) {
 				var currentPoint = e.GetPosition(null);
 				if (Math.Abs(currentPoint.X - startPoint.X) >= SystemParameters.MinimumHorizontalDragDistance ||
@@ -90,38 +101,47 @@ namespace WinDirStat.Net.Wpf.Controls.FileList {
 			}
 		}*/
 
-		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e) {
-            //this can happen when Node is a DisconnectedItem
-            if(Node == null) {
-                return;
+    protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        //this can happen when Node is a DisconnectedItem
+        if (Node == null)
+        {
+            return;
+        }
+
+        if (wasDoubleClick)
+        {
+            wasDoubleClick = false;
+            Node.ActivateItem();
+            if (!e.Handled)
+            {
+                if (!Node.IsRoot || ParentTreeView.ShowRootExpander)
+                {
+                    Node.IsExpanded = !Node.IsExpanded;
+                }
             }
+        }
 
-			if (wasDoubleClick) {
-				wasDoubleClick = false;
-				Node.ActivateItem();
-				if (!e.Handled) {
-					if (!Node.IsRoot || ParentTreeView.ShowRootExpander) {
-						Node.IsExpanded = !Node.IsExpanded;
-					}
-				}
-			}
+        ReleaseMouseCapture();
+        if (wasSelected)
+        {
+            base.OnMouseLeftButtonDown(e);
+        }
+    }
 
-			ReleaseMouseCapture();
-			if (wasSelected) {
-				base.OnMouseLeftButtonDown(e);
-			}
-		}
+    protected override void OnContextMenuOpening(ContextMenuEventArgs e)
+    {
+        if (Node != null)
+        {
+            Node.ShowContextMenu(e);
+        }
+    }
 
-		protected override void OnContextMenuOpening(ContextMenuEventArgs e) {
-			if (Node != null)
-				Node.ShowContextMenu(e);
-		}
+    #endregion
 
-		#endregion
+    #region Drag and Drop
 
-		#region Drag and Drop
-
-		/*protected override void OnDragEnter(DragEventArgs e) {
+    /*protected override void OnDragEnter(DragEventArgs e) {
 			ParentTreeView.HandleDragEnter(this, e);
 		}
 
@@ -137,6 +157,5 @@ namespace WinDirStat.Net.Wpf.Controls.FileList {
 			ParentTreeView.HandleDragLeave(this, e);
 		}*/
 
-		#endregion
-	}
+    #endregion
 }

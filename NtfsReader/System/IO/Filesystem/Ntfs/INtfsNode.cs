@@ -36,7 +36,7 @@ namespace System.IO.Filesystem.Ntfs
     /// </summary>
     public interface INtfsNode
     {
-		FileAttributes Attributes { get; }
+        FileAttributes Attributes { get; }
         UInt32 NodeIndex { get; }
         UInt32 ParentNodeIndex { get; }
         string Name { get; }

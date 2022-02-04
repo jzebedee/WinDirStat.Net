@@ -8,27 +8,33 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace WinDirStat.Net.Wpf.Converters {
-	public class DirectoryExistsToBoolean : MarkupExtension, IValueConverter {
-		public static readonly DirectoryExistsToBoolean Instance = new DirectoryExistsToBoolean();
+namespace WinDirStat.Net.Wpf.Converters;
 
-		public override object ProvideValue(IServiceProvider serviceProvider) {
-			return Instance;
-		}
+public class DirectoryExistsToBoolean : MarkupExtension, IValueConverter
+{
+    public static readonly DirectoryExistsToBoolean Instance = new DirectoryExistsToBoolean();
 
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-			try {
-				string fullPath = Path.GetFullPath(value.ToString());
-				return Directory.Exists(fullPath);
-			}
-			catch {
-				// Path must be invalid
-				return false;
-			}
-		}
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        return Instance;
+    }
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-			throw new NotImplementedException();
-		}
-	}
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        try
+        {
+            string fullPath = Path.GetFullPath(value.ToString());
+            return Directory.Exists(fullPath);
+        }
+        catch
+        {
+            // Path must be invalid
+            return false;
+        }
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
 }

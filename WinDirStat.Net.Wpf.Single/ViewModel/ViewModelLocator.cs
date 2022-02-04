@@ -19,18 +19,21 @@ using WinDirStat.Net.Services;
 using WinDirStat.Net.ViewModel;
 using WinDirStat.Net.Wpf.Services;
 
-namespace WinDirStat.Net.Wpf.ViewModel {
-    /// <summary>
-    /// This class contains static references to all the view models in the
-    /// application and provides an entry point for the bindings.
-    /// </summary>
-    public class ViewModelLocator {
+namespace WinDirStat.Net.Wpf.ViewModel;
 
-		//public SimpleIoc Ioc { get; private set; }
+/// <summary>
+/// This class contains static references to all the view models in the
+/// application and provides an entry point for the bindings.
+/// </summary>
+public class ViewModelLocator
+{
 
-		/// <summary>Initializes the ViewModelLocator class.</summary>
-		static ViewModelLocator() {
-			/*ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+    //public SimpleIoc Ioc { get; private set; }
+
+    /// <summary>Initializes the ViewModelLocator class.</summary>
+    static ViewModelLocator()
+    {
+        /*ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
 			////if (ViewModelBase.IsInDesignModeStatic)
 			////{
@@ -58,43 +61,44 @@ namespace WinDirStat.Net.Wpf.ViewModel {
 			SimpleIoc.Default.Register<MainViewModel>();
 			SimpleIoc.Default.Register<DriveSelectViewModel>();
 			SimpleIoc.Default.Register<ConfigureViewModel>();*/
-		}
+    }
 
-		/// <summary>Initializes a new instance of the ViewModelLocator class.</summary>
-		public ViewModelLocator() {
-            RegisterServices();
-		}
+    /// <summary>Initializes a new instance of the ViewModelLocator class.</summary>
+    public ViewModelLocator()
+    {
+        RegisterServices();
+    }
 
-        private void RegisterServices() {
-            var collection = new ServiceCollection()
-                .AddSingleton<SettingsService>()
-                .AddSingleton<ScanningService>()
-                .AddSingleton<UIService>()
-                .AddSingleton<BitmapFactory>()
-                .AddSingleton<IconCacheService>()
-                .AddSingleton<ClipboardService>()
-                .AddSingleton<OSService>()
-                .AddSingleton<IMyDialogService, DialogService>()
-                .AddSingleton<ImagesServiceBase, ResourceImagesService>()
-                .AddSingleton<TreemapRendererFactory>()
-                .AddSingleton<RelayCommandFactory, RelayInfoCommandFactory>()
+    private void RegisterServices()
+    {
+        var collection = new ServiceCollection()
+            .AddSingleton<SettingsService>()
+            .AddSingleton<ScanningService>()
+            .AddSingleton<UIService>()
+            .AddSingleton<BitmapFactory>()
+            .AddSingleton<IconCacheService>()
+            .AddSingleton<ClipboardService>()
+            .AddSingleton<OSService>()
+            .AddSingleton<IMyDialogService, DialogService>()
+            .AddSingleton<ImagesServiceBase, ResourceImagesService>()
+            .AddSingleton<TreemapRendererFactory>()
+            .AddSingleton<RelayCommandFactory, RelayInfoCommandFactory>()
 
-                .AddSingleton<MainViewModel>()
-                .AddSingleton<DriveSelectViewModel>()
-                .AddSingleton<ConfigureViewModel>()
+            .AddSingleton<MainViewModel>()
+            .AddSingleton<DriveSelectViewModel>()
+            .AddSingleton<ConfigureViewModel>()
 
-                .BuildServiceProvider();
+            .BuildServiceProvider();
 
-            Ioc.Default.ConfigureServices(collection);
-        }
+        Ioc.Default.ConfigureServices(collection);
+    }
 
-        public MainViewModel Main => Ioc.Default.GetService<MainViewModel>();
-		public DriveSelectViewModel DriveSelect => Ioc.Default.GetService<DriveSelectViewModel>();
-		public ConfigureViewModel Configure => Ioc.Default.GetService<ConfigureViewModel>();
-		/*public TreemapRendererFactory TreemapFactory => ServiceLocator.Current.GetInstance<TreemapRendererFactory>();
+    public MainViewModel Main => Ioc.Default.GetService<MainViewModel>();
+    public DriveSelectViewModel DriveSelect => Ioc.Default.GetService<DriveSelectViewModel>();
+    public ConfigureViewModel Configure => Ioc.Default.GetService<ConfigureViewModel>();
+    /*public TreemapRendererFactory TreemapFactory => ServiceLocator.Current.GetInstance<TreemapRendererFactory>();
 
 		public TreemapRenderer CreateTreemap() {
 			return TreemapFactory.Create();
 		}*/
-	}
 }

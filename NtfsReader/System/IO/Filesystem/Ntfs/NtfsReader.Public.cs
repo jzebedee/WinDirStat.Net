@@ -52,7 +52,9 @@ namespace System.IO.Filesystem.Ntfs
         public NtfsReader(DriveInfo driveInfo, RetrieveMode retrieveMode)
         {
             if (driveInfo == null)
+            {
                 throw new ArgumentNullException("driveInfo");
+            }
 
             _driveInfo = driveInfo;
             _retrieveMode = retrieveMode;
@@ -74,12 +76,14 @@ namespace System.IO.Filesystem.Ntfs
                     );
 
             if (_volumeHandle == null || _volumeHandle.IsInvalid)
+            {
                 throw new IOException(
                     string.Format(
                         "Unable to open volume {0}. Make sure it exists and that you have Administrator privileges.",
                         driveInfo
                     )
                 );
+            }
 
             using (_volumeHandle)
             {
@@ -104,7 +108,7 @@ namespace System.IO.Filesystem.Ntfs
         {
             get { return _nodes.Length; }
         }
-        
+
         /// <summary>
         /// Get all nodes under the specified rootPath.
         /// </summary>
@@ -119,8 +123,12 @@ namespace System.IO.Filesystem.Ntfs
             //TODO use Parallel.Net to process this when it becomes available
             UInt32 nodeCount = (UInt32)_nodes.Length;
             for (UInt32 i = 0; i < nodeCount; ++i)
+            {
                 if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase))
+                {
                     nodes.Add(new NodeWrapper(this, i, _nodes[i]));
+                }
+            }
 
             stopwatch.Stop();
 
@@ -136,40 +144,45 @@ namespace System.IO.Filesystem.Ntfs
             return nodes;
         }
 
-		/// <summary>
-		/// Get all nodes under the specified rootPath.
-		/// </summary>
-		/// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
-		public IEnumerable<INtfsNode> EnumerateNodes(string rootPath) {
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.Start();
-			int count = 0;
-			try {
-				
-				//TODO use Parallel.Net to process this when it becomes available
-				UInt32 nodeCount = (UInt32) _nodes.Length;
-				for (UInt32 i = 0; i < nodeCount; ++i)
-					if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase)) {
-						yield return new NodeWrapper(this, i, _nodes[i]);
-						count++;
-					}
-				
-			}
-			finally {
-				stopwatch.Stop();
+        /// <summary>
+        /// Get all nodes under the specified rootPath.
+        /// </summary>
+        /// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
+        public IEnumerable<INtfsNode> EnumerateNodes(string rootPath)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            int count = 0;
+            try
+            {
 
-				Trace.WriteLine(
-					string.Format(
-						"{0} node{1} have been retrieved in {2} ms",
-						count,
-						count != 1 ? "s" : string.Empty,
-						(float) stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond
-					)
-				);
-			}
-		}
+                //TODO use Parallel.Net to process this when it becomes available
+                UInt32 nodeCount = (UInt32)_nodes.Length;
+                for (UInt32 i = 0; i < nodeCount; ++i)
+                {
+                    if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        yield return new NodeWrapper(this, i, _nodes[i]);
+                        count++;
+                    }
+                }
+            }
+            finally
+            {
+                stopwatch.Stop();
 
-		public byte[] GetVolumeBitmap()
+                Trace.WriteLine(
+                    string.Format(
+                        "{0} node{1} have been retrieved in {2} ms",
+                        count,
+                        count != 1 ? "s" : string.Empty,
+                        (float)stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond
+                    )
+                );
+            }
+        }
+
+        public byte[] GetVolumeBitmap()
         {
             return _bitmapData;
         }
