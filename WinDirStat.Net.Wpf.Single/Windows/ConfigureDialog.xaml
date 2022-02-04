@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WinDirStat.Net.Wpf.Controls"
         xmlns:sort="clr-namespace:WinDirStat.Net.Wpf.Controls.SortList"
         xmlns:conv="clr-namespace:WinDirStat.Net.Wpf.Converters"
-        xmlns:ff="clr-namespace:FunctionalFun.UI.Behaviors;assembly=FunctionalFun.UI.Behaviors"
+        xmlns:ff="clr-namespace:WinDirStat.Net.Wpf.Behaviors"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         DataContext="{Binding Configure, Source={StaticResource Locator}}"

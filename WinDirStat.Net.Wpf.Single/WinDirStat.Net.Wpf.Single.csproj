@@ -24,7 +24,6 @@
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 	</ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\FunctionalFun.UI.Behaviours\FunctionalFun.UI.Behaviors.csproj" />
         <ProjectReference Include="..\WinDirStat.Net.Wpf.Base\WinDirStat.Net.Wpf.Base.csproj" />
     </ItemGroup>
 </Project>

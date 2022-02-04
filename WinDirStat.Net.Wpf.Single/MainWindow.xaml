@@ -10,7 +10,7 @@
         xmlns:cmd="clr-namespace:WinDirStat.Net.Wpf.Commands"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
-        xmlns:ff="clr-namespace:FunctionalFun.UI.Behaviors;assembly=FunctionalFun.UI.Behaviors"
+        xmlns:ff="clr-namespace:WinDirStat.Net.Wpf.Behaviors"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
