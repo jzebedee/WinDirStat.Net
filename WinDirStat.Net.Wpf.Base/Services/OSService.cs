@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Security.Principal;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using WinDirStat.Net.Services;
 using static WinDirStat.Net.Native.Win32;
 
 namespace WinDirStat.Net.Services {
@@ -38,7 +33,7 @@ namespace WinDirStat.Net.Services {
         #region Privileges
 
         /// <summary>Gets if the current process has elevated privileges.</summary>
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("windows7.0")]
         public bool IsElevated => isElevated ??= WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid);
 
         public void StartNewElevated() {

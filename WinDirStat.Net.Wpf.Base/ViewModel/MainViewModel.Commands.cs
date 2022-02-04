@@ -113,8 +113,8 @@ namespace WinDirStat.Net.ViewModel {
 		private bool CanExecuteEmptyRecycleBin() {
 			return allRecycleBinInfo.ItemCount != 0 && allRecycleBinInfo.Size != 0;
 		}
-        [SupportedOSPlatform("windows")]
-		private bool CanExecuteElevate() {
+        [SupportedOSPlatform("windows7.0")]
+        private bool CanExecuteElevate() {
 			return !OS.IsElevated;
 		}
 
