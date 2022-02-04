@@ -53,10 +53,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// </summary>
     /// 
     /// <param name="action">The action that caused the event (must be Reset).</param>
-    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action));
-    }
+    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action));
 
     #endregion
 
@@ -70,10 +67,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// The action that caused the event; can only be Reset, Add or Remove action.
     /// </param>
     /// <param name="changedItem">The item affected by the change.</param>
-    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem));
-    }
+    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a one-item change.
@@ -83,10 +77,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="changedItem">The item affected by the change.</param>
     /// <param name="index">The index where the change occurred.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem,
-        int index)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem, index));
-    }
+        int index) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem, index));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a multi-item change.
@@ -94,10 +85,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// 
     /// <param name="action">The action that caused the event.</param>
     /// <param name="changedItems">The items affected by the change.</param>
-    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList changedItems)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems));
-    }
+    protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList changedItems) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a multi-item change.
@@ -107,10 +95,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="changedItems">The items affected by the change.</param>
     /// <param name="startingIndex">The index where the change occurred.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList changedItems,
-        int startingIndex)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems, startingIndex));
-    }
+        int startingIndex) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems, startingIndex));
 
     #endregion
 
@@ -124,10 +109,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="newItem">The new item replacing the original item.</param>
     /// <param name="oldItem">The original item that is replaced.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object newItem,
-        object oldItem)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
-    }
+        object oldItem) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a one-item Replace event.
@@ -138,10 +120,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="oldItem">The original item that is replaced.</param>
     /// <param name="index">The index of the item being replaced.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object newItem,
-        object oldItem, int index)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
-    }
+        object oldItem, int index) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a multi-item Replace event.
@@ -151,10 +130,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="newItems">The new items replacing the original items.</param>
     /// <param name="oldItems">The original items that are replaced.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList newItems,
-        IList oldItems)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItems, oldItems));
-    }
+        IList oldItems) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItems, oldItems));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a multi-item Replace event.
@@ -165,10 +141,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="oldItems">The original items that are replaced.</param>
     /// <param name="startingIndex">The starting index of the items being replaced.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList newItems,
-        IList oldItems, int index)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItems, oldItems, index));
-    }
+        IList oldItems, int index) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItems, oldItems, index));
 
     #endregion
 
@@ -183,10 +156,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="index">The new index for the changed item.</param>
     /// <param name="oldIndex">The old index for the changed item.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, object changedItem,
-        int index, int oldIndex)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem, index, oldIndex));
-    }
+        int index, int oldIndex) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItem, index, oldIndex));
 
     /// <summary>
     /// Raises a new <see cref="CollectionChanged"/> event that describes a multi-item Move event.
@@ -197,10 +167,7 @@ public abstract class ObservablePropertyCollectionObject : ObservableObject, INo
     /// <param name="oldItems">The original items that are replaced.</param>
     /// <param name="startingIndex">The starting index of the items being replaced.</param>
     protected void RaiseCollectionChanged(NotifyCollectionChangedAction action, IList changedItems,
-        int index, int oldIndex)
-    {
-        RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems, index, oldIndex));
-    }
+        int index, int oldIndex) => RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(action, changedItems, index, oldIndex));
 
     #endregion
 

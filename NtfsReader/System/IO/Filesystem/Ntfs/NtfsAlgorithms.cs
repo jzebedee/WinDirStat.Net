@@ -31,74 +31,71 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.IO.Filesystem.Ntfs
+namespace System.IO.Filesystem.Ntfs;
+
+public static class NtfsAlgorithms
 {
-    public static class NtfsAlgorithms
+    public static IDictionary<uint, List<INtfsNode>> AggregateByFragments(IEnumerable<INtfsNode> nodes, uint minimumFragments)
     {
-        public static IDictionary<UInt32, List<INtfsNode>> AggregateByFragments(IEnumerable<INtfsNode> nodes, UInt32 minimumFragments)
+        Dictionary<uint, List<INtfsNode>> fragmentsAggregate = new();
+
+        foreach (INtfsNode node in nodes)
         {
-            Dictionary<UInt32, List<INtfsNode>> fragmentsAggregate = new Dictionary<UInt32, List<INtfsNode>>();
-
-            foreach (INtfsNode node in nodes)
+            IList<INtfsStream> streams = node.Streams;
+            if (streams == null || streams.Count == 0)
             {
-                IList<INtfsStream> streams = node.Streams;
-                if (streams == null || streams.Count == 0)
-                {
-                    continue;
-                }
-
-                IList<INtfsFragment> fragments = streams[0].Fragments;
-                if (fragments == null)
-                {
-                    continue;
-                }
-
-                UInt32 fragmentCount = (UInt32)fragments.Count;
-
-                if (fragmentCount < minimumFragments)
-                {
-                    continue;
-                }
-
-                List<INtfsNode> nodeList;
-                fragmentsAggregate.TryGetValue(fragmentCount, out nodeList);
-
-                if (nodeList == null)
-                {
-                    nodeList = new List<INtfsNode>();
-                    fragmentsAggregate[fragmentCount] = nodeList;
-                }
-
-                nodeList.Add(node);
+                continue;
             }
 
-            return fragmentsAggregate;
-        }
-
-        public static IDictionary<UInt64, List<INtfsNode>> AggregateBySize(IEnumerable<INtfsNode> nodes, UInt64 minimumSize)
-        {
-            Dictionary<UInt64, List<INtfsNode>> sizeAggregate = new Dictionary<ulong, List<INtfsNode>>();
-
-            foreach (INtfsNode node in nodes)
+            IList<INtfsFragment> fragments = streams[0].Fragments;
+            if (fragments == null)
             {
-                if ((node.Attributes & FileAttributes.Directory) != 0 || node.Size < minimumSize)
-                {
-                    continue;
-                }
-
-                List<INtfsNode> nodeList;
-                sizeAggregate.TryGetValue(node.Size, out nodeList);
-
-                if (nodeList == null)
-                {
-                    nodeList = new List<INtfsNode>();
-                    sizeAggregate[node.Size] = nodeList;
-                }
-
-                nodeList.Add(node);
+                continue;
             }
 
-            return sizeAggregate;
+            uint fragmentCount = (uint)fragments.Count;
+
+            if (fragmentCount < minimumFragments)
+            {
+                continue;
+            }
+
+            fragmentsAggregate.TryGetValue(fragmentCount, out List<INtfsNode> nodeList);
+
+            if (nodeList == null)
+            {
+                nodeList = new List<INtfsNode>();
+                fragmentsAggregate[fragmentCount] = nodeList;
+            }
+
+            nodeList.Add(node);
         }
+
+        return fragmentsAggregate;
+    }
+
+    public static IDictionary<ulong, List<INtfsNode>> AggregateBySize(IEnumerable<INtfsNode> nodes, ulong minimumSize)
+    {
+        Dictionary<ulong, List<INtfsNode>> sizeAggregate = new();
+
+        foreach (INtfsNode node in nodes)
+        {
+            if ((node.Attributes & FileAttributes.Directory) != 0 || node.Size < minimumSize)
+            {
+                continue;
+            }
+
+            sizeAggregate.TryGetValue(node.Size, out List<INtfsNode> nodeList);
+
+            if (nodeList == null)
+            {
+                nodeList = new List<INtfsNode>();
+                sizeAggregate[node.Size] = nodeList;
+            }
+
+            nodeList.Add(node);
+        }
+
+        return sizeAggregate;
     }
 }

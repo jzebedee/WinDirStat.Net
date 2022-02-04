@@ -27,21 +27,20 @@
     Danny Couture
     Software Architect
 */
-namespace System.IO.Filesystem.Ntfs
+namespace System.IO.Filesystem.Ntfs;
+
+/// <summary>
+/// This is where the parts of the file are located on the volume.
+/// </summary>
+public interface INtfsFragment
 {
     /// <summary>
-    /// This is where the parts of the file are located on the volume.
+    /// Logical cluster number, location on disk. 
     /// </summary>
-    public interface INtfsFragment
-    {
-        /// <summary>
-        /// Logical cluster number, location on disk. 
-        /// </summary>
-        UInt64 Lcn { get; }
+    ulong Lcn { get; }
 
-        /// <summary>
-        /// Virtual cluster number of next fragment.
-        /// </summary>
-        UInt64 NextVcn { get; }
-    }
+    /// <summary>
+    /// Virtual cluster number of next fragment.
+    /// </summary>
+    ulong NextVcn { get; }
 }

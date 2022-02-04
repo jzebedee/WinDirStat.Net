@@ -31,173 +31,169 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-namespace System.IO.Filesystem.Ntfs
+namespace System.IO.Filesystem.Ntfs;
+
+/// <summary>
+/// Ntfs metadata reader.
+/// 
+/// This class is used to get files & directories information of an NTFS volume.
+/// This is a lot faster than using conventional directory browsing method
+/// particularly when browsing really big directories.
+/// </summary>
+/// <remarks>Admnistrator rights are required in order to use this method.</remarks>
+public partial class NtfsReader
 {
     /// <summary>
-    /// Ntfs metadata reader.
-    /// 
-    /// This class is used to get files & directories information of an NTFS volume.
-    /// This is a lot faster than using conventional directory browsing method
-    /// particularly when browsing really big directories.
+    /// NtfsReader constructor.
     /// </summary>
-    /// <remarks>Admnistrator rights are required in order to use this method.</remarks>
-    public partial class NtfsReader
+    /// <param name="driveInfo">The drive you want to read metadata from.</param>
+    /// <param name="include">Information to retrieve from each node while scanning the disk</param>
+    /// <remarks>Streams & Fragments are expensive to store in memory, if you don't need them, don't retrieve them.</remarks>
+    public NtfsReader(DriveInfo driveInfo, RetrieveMode retrieveMode)
     {
-        /// <summary>
-        /// NtfsReader constructor.
-        /// </summary>
-        /// <param name="driveInfo">The drive you want to read metadata from.</param>
-        /// <param name="include">Information to retrieve from each node while scanning the disk</param>
-        /// <remarks>Streams & Fragments are expensive to store in memory, if you don't need them, don't retrieve them.</remarks>
-        public NtfsReader(DriveInfo driveInfo, RetrieveMode retrieveMode)
+        if (driveInfo == null)
         {
-            if (driveInfo == null)
-            {
-                throw new ArgumentNullException("driveInfo");
-            }
+            throw new ArgumentNullException("driveInfo");
+        }
 
-            _driveInfo = driveInfo;
-            _retrieveMode = retrieveMode;
+        _driveInfo = driveInfo;
+        _retrieveMode = retrieveMode;
 
-            StringBuilder builder = new StringBuilder(1024);
-            GetVolumeNameForVolumeMountPoint(_driveInfo.RootDirectory.Name, builder, builder.Capacity);
+        StringBuilder builder = new(1024);
+        GetVolumeNameForVolumeMountPoint(_driveInfo.RootDirectory.Name, builder, builder.Capacity);
 
-            string volume = builder.ToString().TrimEnd(new char[] { '\\' });
+        string volume = builder.ToString().TrimEnd(new char[] { '\\' });
 
-            _volumeHandle =
-                CreateFile(
-                    volume,
-                    FileAccess.Read,
-                    FileShare.All,
-                    IntPtr.Zero,
-                    FileMode.Open,
-                    0,
-                    IntPtr.Zero
-                    );
-
-            if (_volumeHandle == null || _volumeHandle.IsInvalid)
-            {
-                throw new IOException(
-                    string.Format(
-                        "Unable to open volume {0}. Make sure it exists and that you have Administrator privileges.",
-                        driveInfo
-                    )
+        _volumeHandle =
+            CreateFile(
+                volume,
+                FileAccess.Read,
+                FileShare.All,
+                IntPtr.Zero,
+                FileMode.Open,
+                0,
+                IntPtr.Zero
                 );
-            }
 
-            using (_volumeHandle)
+        if (_volumeHandle == null || _volumeHandle.IsInvalid)
+        {
+            throw new IOException(
+                string.Format(
+                    "Unable to open volume {0}. Make sure it exists and that you have Administrator privileges.",
+                    driveInfo
+                )
+            );
+        }
+
+        using (_volumeHandle)
+        {
+            InitializeDiskInfo();
+
+            _nodes = ProcessMft();
+        }
+
+        //cleanup anything that isn't used anymore
+        _nameIndex = null;
+        _volumeHandle = null;
+
+        GC.Collect();
+    }
+
+    public INtfsDiskInfo DiskInfo
+    {
+        get { return _diskInfo; }
+    }
+
+    public int NodeCount
+    {
+        get { return _nodes.Length; }
+    }
+
+    /// <summary>
+    /// Get all nodes under the specified rootPath.
+    /// </summary>
+    /// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
+    public List<INtfsNode> GetNodes(string rootPath)
+    {
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
+        List<INtfsNode> nodes = new();
+
+        //TODO use Parallel.Net to process this when it becomes available
+        uint nodeCount = (uint)_nodes.Length;
+        for (uint i = 0; i < nodeCount; ++i)
+        {
+            if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase))
             {
-                InitializeDiskInfo();
-
-                _nodes = ProcessMft();
+                nodes.Add(new NodeWrapper(this, i, _nodes[i]));
             }
-
-            //cleanup anything that isn't used anymore
-            _nameIndex = null;
-            _volumeHandle = null;
-
-            GC.Collect();
         }
 
-        public INtfsDiskInfo DiskInfo
-        {
-            get { return _diskInfo; }
-        }
+        stopwatch.Stop();
 
-        public int NodeCount
-        {
-            get { return _nodes.Length; }
-        }
+        Trace.WriteLine(
+            string.Format(
+                "{0} node{1} have been retrieved in {2} ms",
+                nodes.Count,
+                nodes.Count > 1 ? "s" : string.Empty,
+                (float)stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond
+            )
+        );
 
-        /// <summary>
-        /// Get all nodes under the specified rootPath.
-        /// </summary>
-        /// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
-        public List<INtfsNode> GetNodes(string rootPath)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+        return nodes;
+    }
 
-            List<INtfsNode> nodes = new List<INtfsNode>();
+    /// <summary>
+    /// Get all nodes under the specified rootPath.
+    /// </summary>
+    /// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
+    public IEnumerable<INtfsNode> EnumerateNodes(string rootPath)
+    {
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+        int count = 0;
+        try
+        {
 
             //TODO use Parallel.Net to process this when it becomes available
-            UInt32 nodeCount = (UInt32)_nodes.Length;
-            for (UInt32 i = 0; i < nodeCount; ++i)
+            uint nodeCount = (uint)_nodes.Length;
+            for (uint i = 0; i < nodeCount; ++i)
             {
                 if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    nodes.Add(new NodeWrapper(this, i, _nodes[i]));
+                    yield return new NodeWrapper(this, i, _nodes[i]);
+                    count++;
                 }
             }
-
+        }
+        finally
+        {
             stopwatch.Stop();
 
             Trace.WriteLine(
                 string.Format(
                     "{0} node{1} have been retrieved in {2} ms",
-                    nodes.Count,
-                    nodes.Count > 1 ? "s" : string.Empty,
+                    count,
+                    count != 1 ? "s" : string.Empty,
                     (float)stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond
                 )
             );
-
-            return nodes;
         }
-
-        /// <summary>
-        /// Get all nodes under the specified rootPath.
-        /// </summary>
-        /// <param name="rootPath">The rootPath must at least contains the drive and may include any number of subdirectories. Wildcards aren't supported.</param>
-        public IEnumerable<INtfsNode> EnumerateNodes(string rootPath)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            int count = 0;
-            try
-            {
-
-                //TODO use Parallel.Net to process this when it becomes available
-                UInt32 nodeCount = (UInt32)_nodes.Length;
-                for (UInt32 i = 0; i < nodeCount; ++i)
-                {
-                    if (_nodes[i].NameIndex != 0 && GetNodeFullNameCore(i).StartsWith(rootPath, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        yield return new NodeWrapper(this, i, _nodes[i]);
-                        count++;
-                    }
-                }
-            }
-            finally
-            {
-                stopwatch.Stop();
-
-                Trace.WriteLine(
-                    string.Format(
-                        "{0} node{1} have been retrieved in {2} ms",
-                        count,
-                        count != 1 ? "s" : string.Empty,
-                        (float)stopwatch.ElapsedTicks / TimeSpan.TicksPerMillisecond
-                    )
-                );
-            }
-        }
-
-        public byte[] GetVolumeBitmap()
-        {
-            return _bitmapData;
-        }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            if (_volumeHandle != null)
-            {
-                _volumeHandle.Dispose();
-                _volumeHandle = null;
-            }
-        }
-
-        #endregion
     }
+
+    public byte[] GetVolumeBitmap() => _bitmapData;
+
+    #region IDisposable Members
+
+    public void Dispose()
+    {
+        if (_volumeHandle != null)
+        {
+            _volumeHandle.Dispose();
+            _volumeHandle = null;
+        }
+    }
+
+    #endregion
 }

@@ -21,15 +21,9 @@ public class RelayInfoCommand<T> : IRelayInfoCommand, IRelayCommand<T>
 
     #region Constructors
 
-    public RelayInfoCommand(Action<T> execute)
-    {
-        command = new(execute);
-    }
+    public RelayInfoCommand(Action<T> execute) => command = new(execute);
 
-    public RelayInfoCommand(Action<T> execute, Predicate<T> canExecute)
-    {
-        command = new(execute, canExecute);
-    }
+    public RelayInfoCommand(Action<T> execute, Predicate<T> canExecute) => command = new(execute, canExecute);
 
     #endregion
 
@@ -96,10 +90,7 @@ public class RelayInfoCommand<T> : IRelayInfoCommand, IRelayCommand<T>
 
     #region Private PropertyChanged
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 

@@ -29,15 +29,14 @@
 */
 using System.Collections.Generic;
 
-namespace System.IO.Filesystem.Ntfs
+namespace System.IO.Filesystem.Ntfs;
+
+/// <summary>
+/// In Ntfs, each node may have multiple streams.
+/// </summary>
+public interface INtfsStream
 {
-    /// <summary>
-    /// In Ntfs, each node may have multiple streams.
-    /// </summary>
-    public interface INtfsStream
-    {
-        string Name { get; }
-        UInt64 Size { get; }
-        IList<INtfsFragment> Fragments { get; }
-    }
+    string Name { get; }
+    ulong Size { get; }
+    IList<INtfsFragment> Fragments { get; }
 }

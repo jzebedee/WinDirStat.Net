@@ -8,7 +8,7 @@ public class ObservableVolatileObject : ObservableObjectEx
 {
 
     /// <summary>The lock for volatile properties.</summary>
-    protected readonly object volatileLock = new object();
+    protected readonly object volatileLock = new();
 
     /// <summary>Gets the property and ensures its under lock while accessing it.</summary>
     /// 
