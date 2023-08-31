@@ -53,6 +53,7 @@ namespace WinDirStat.Net.Services {
 				Arguments = string.Join(" ", Environment.GetCommandLineArgs().Select(a => "\"" + a + "\"")),
 				WorkingDirectory = Directory.GetCurrentDirectory(),
 				Verb = "runas",
+                UseShellExecute = true
 			};
 			Process.Start(startInfo).Dispose();
 		}
@@ -67,6 +68,7 @@ namespace WinDirStat.Net.Services {
 		public void RunItem(string file) {
 			ProcessStartInfo startInfo = new ProcessStartInfo {
 				FileName = file,
+                UseShellExecute = true
 			};
 			Process.Start(startInfo)?.Dispose();
 		}
