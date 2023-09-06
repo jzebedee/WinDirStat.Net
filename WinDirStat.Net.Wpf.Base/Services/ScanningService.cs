@@ -780,13 +780,8 @@ namespace WinDirStat.Net.Services {
             if (!file.IsFileType || file.Type == FileItemType.Volume)
                 throw new InvalidOperationException("Can only delete files or folders");
             if (os.DeleteOrRecycleFile(file.FullName, recycle)) {
-                // File was successfully deleted, let's remove it from the file tree
-                // Set IsRefreshing to trigger any required UI invalidation
-                IsRefreshing = true;
-                FolderItem parent = file.Parent;
-                parent.RemoveItem(file);
-                parent.UpdwardsFullValidate();
-                IsRefreshing = false;
+                // File was successfully deleted, let's refresh its parent
+                RefreshFilesAsync(new FileItemBase[]{ file.FileParent });
                 return true;
             }
             return false;
@@ -805,7 +800,7 @@ namespace WinDirStat.Net.Services {
             ThrowIfScanning();
             lock (threadLock) {
                 ScanPrepare(true);
-                Debug.Assert(scanTask == null);
+                Debug.Assert(scanTask == null || scanTask.IsCompleted);
                 scanTask = Task.Run(() => RefreshThread(selectedFiles, cancel.Token));
             }
         }
@@ -868,7 +863,7 @@ namespace WinDirStat.Net.Services {
             lock (threadLock) {
                 ScanPrepare(true);
                 rootPaths = driveSelectResult.GetResultPaths();
-                Debug.Assert(scanTask == null);
+                Debug.Assert(scanTask == null || scanTask.IsCompleted);
                 scanTask = Task.Run(() => ScanThread(false, cancel.Token));
             }
         }

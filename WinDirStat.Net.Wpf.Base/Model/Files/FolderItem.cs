@@ -536,7 +536,7 @@ namespace WinDirStat.Net.Model.Files {
 		/// </param>
 		public void RemoveItem(FileItemBase item, ref FolderItem fileCollection/*, ref FileItem firstFile*/) {
 			if (Type == FileItemType.FileCollection)
-				throw new InvalidOperationException($"Cannot call {nameof(AddItem)} from a File Collection!");
+				throw new InvalidOperationException($"Cannot call {nameof(RemoveItem)} from a File Collection!");
 
 			lock (children) {
 				if (item.Type == FileItemType.File) {
